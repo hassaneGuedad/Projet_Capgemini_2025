@@ -67,7 +67,7 @@ export const Navbar: React.FC = () => {
       }
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
-      // On peut ici stocker l'utilisateur dans le contexte si besoin
+      // On peut ici stocker l'utilisateur dans le contexte si besoin / 
       setIsLoginOpen(false);
       setIsLoginMode(true);
     } catch (error: any) {
