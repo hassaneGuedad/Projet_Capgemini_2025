@@ -1,6 +1,6 @@
 import { Plan } from "@/types/agents";
 
 export async function PlannerAgent(plan: Plan) {
-  // Ici, tu pourrais enrichir la structure, ajouter des fichiers, etc.
+  // Ici, je peux enrichir la structure, ajouter des fichiers.
   return plan.files;
 }

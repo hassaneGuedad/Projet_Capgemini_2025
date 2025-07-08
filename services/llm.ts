@@ -1,5 +1,19 @@
 import { LLMManager } from '@/lib/modules/llm/manager';
 
+function enrichPrompt(userPrompt: string): string {
+  return `
+Ignore toute explication, README ou texte hors code.
+
+À partir de cette demande utilisateur :
+"${userPrompt}"
+
+Génère le code complet sous forme de plusieurs fichiers si nécessaire.
+Pour chaque fichier, commence par une ligne :
+=== NomDuFichier.extension ===
+(code ici)
+Ne mets rien d'autre que les fichiers et leur code, sans explication, sans README, sans balises Markdown.`;
+}
+
 export class LLMService {
   private static instance: LLMService;
   private llmManager: LLMManager;
@@ -15,20 +29,21 @@ export class LLMService {
     return LLMService.instance;
   }
 
-  async callClaude(prompt: string, system?: string): Promise<string> {
-    try {
-      return await this.llmManager.callModel('Anthropic', 'claude-3-5-sonnet-latest', prompt, system);
-    } catch (error) {
-      console.error('Error calling Claude:', error);
-      throw error;
-    }
-  }
-
   async callModel(provider: string, model: string, prompt: string, system?: string): Promise<string> {
     try {
       return await this.llmManager.callModel(provider, model, prompt, system);
     } catch (error) {
       console.error(`Error calling ${provider}/${model}:`, error);
+      throw error;
+    }
+  }
+
+  async callDeepSeek(prompt: string, system?: string): Promise<string> {
+    try {
+      const enhancedPrompt = enrichPrompt(prompt);
+      return await this.llmManager.callModel('DeepSeek', 'deepseek-chat', enhancedPrompt, system);
+    } catch (error) {
+      console.error('Error calling DeepSeek:', error);
       throw error;
     }
   }
@@ -40,10 +55,4 @@ export class LLMService {
   getAvailableProviders() {
     return this.llmManager.getAllProviders();
   }
-}
-
-// Fonction de compatibilité avec l'ancien service
-export async function callClaude(prompt: string, system?: string): Promise<string> {
-  const llmService = LLMService.getInstance();
-  return await llmService.callClaude(prompt, system);
 } 

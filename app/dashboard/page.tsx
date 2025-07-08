@@ -25,7 +25,7 @@ import {
 } from 'lucide-react';
 import { getUserPlanDrafts, deletePlanDraft } from '@/services/firestore';
 import toast from 'react-hot-toast';
-import AnthropicProvider from '@/lib/modules/llm/providers/anthropic';
+import DeepseekProvider from '@/lib/modules/llm/providers/deepseek';
 
 type GenerationStatus = 'idle' | 'generating' | 'completed';
 
@@ -52,6 +52,7 @@ export default function Dashboard() {
   const [sortDesc, setSortDesc] = useState(true);
   const [page, setPage] = useState(1);
   const pageSize = 5;
+  const [selectedFile, setSelectedFile] = useState<ProjectFile | null>(null);
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -145,16 +146,34 @@ export default function Dashboard() {
     setGenerationStatus(STATUS.GENERATING);
     setProgress(70);
     try {
-      // Utilisation de la route API Next.js pour interroger Anthropic côté serveur
-      const response = await fetch('/api/anthropic', {
+      // Utilisation de la route API Next.js pour interroger DeepSeek côté serveur
+      const response = await fetch('/api/deepseek', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt: currentPrompt }),
       });
       const data = await response.json();
-      console.log('Réponse Anthropic brute:', data);
+      console.log('Réponse DeepSeek brute:', data);
       const generated = data.content?.[0]?.text || '';
-      setFiles([{ id: 'anthropic-result', name: 'result.txt', type: 'page', path: 'result.txt', size: `${generated.length} B`, lastModified: new Date(), description: `Réponse Anthropic :\n${generated}` }]);
+      // Découper la réponse DeepSeek en plusieurs fichiers, toutes extensions
+      const fileBlocks = generated.split(/===\s*([^\s=]+?\.[a-zA-Z0-9]+)\s*===/g).filter(Boolean);
+      const filesArray = [];
+      for (let i = 0; i < fileBlocks.length; i += 2) {
+        const name = fileBlocks[i].trim();
+        let content = (fileBlocks[i + 1] || '').trim();
+        // Nettoyer le code : retirer les balises ``` éventuelles et les lignes vides
+        content = content.replace(/^```[a-zA-Z]*\s*|```$/gm, '').trim();
+        filesArray.push({
+          id: name,
+          name,
+          type: getFileType(name),
+          path: name,
+          size: `${content.length} B`,
+          lastModified: new Date(),
+          description: content,
+        });
+      }
+      setFiles(filesArray);
       setGenerationStatus(STATUS.COMPLETED);
       setProgress(100);
       setPlanValidated(true);
@@ -354,7 +373,15 @@ export default function Dashboard() {
           {/* Left Column - Plan Overview */}
           <div className="lg:col-span-2 space-y-8">
             {plan && !planValidated && <PlanOverview plan={plan} onAllStepsValidated={handlePlanValidated} />}
-            {files.length > 0 && <FileList files={files} />}
+            {files.length > 0 && <FileList files={files} onSelectFile={setSelectedFile} selectedFile={selectedFile} />}
+            {selectedFile && (
+              <div className="mt-6">
+                <h3 className="font-bold mb-2">{selectedFile.name}</h3>
+                <pre className="bg-gray-900 text-white p-4 rounded overflow-x-auto">
+                  {selectedFile.description}
+                </pre>
+              </div>
+            )}
             {/* Conseils en bas à gauche */}
             <Card className="border-0 shadow-lg bg-gradient-to-r from-blue-50 to-purple-50">
               <CardHeader>

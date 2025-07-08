@@ -30,6 +30,7 @@ export default function RootLayout({
     <html lang="fr">
       <head>
         <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet" />
+        <link rel="icon" href="/img/mini_cap_logo-removebg-preview.png" type="image/png" />
       </head>
       <body className={inter.className}>
         <AuthProvider>

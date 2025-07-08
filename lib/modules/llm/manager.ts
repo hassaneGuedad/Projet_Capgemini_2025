@@ -1,6 +1,7 @@
 import { BaseProvider } from './base-provider';
 import type { ModelInfo } from './types';
 import AnthropicProvider from './anthropic-provider';
+import DeepseekProvider from './providers/deepseek';
 
 export class LLMManager {
   private static _instance: LLMManager;
@@ -22,6 +23,10 @@ export class LLMManager {
     // Enregistrer le provider Anthropic
     const anthropicProvider = new AnthropicProvider();
     this.registerProvider(anthropicProvider);
+
+    // Enregistrer le provider DeepSeek
+    const deepseekProvider = new DeepseekProvider();
+    this.registerProvider(deepseekProvider);
   }
 
   registerProvider(provider: BaseProvider) {
