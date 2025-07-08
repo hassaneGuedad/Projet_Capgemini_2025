@@ -8,6 +8,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Sparkles, Send, Loader2, X } from 'lucide-react';
 import { detectTechnologies, getTechDisplayName, getTechIcon, type TechId } from '@/lib/tech-detector';
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 
 interface PromptFormProps {
   onSubmit?: (prompt: string) => void;
@@ -19,6 +21,8 @@ export const PromptForm: React.FC<PromptFormProps> = ({ onSubmit }) => {
   const [detectedTechs, setDetectedTechs] = useState<TechId[]>([]);
   const [selectedTechs, setSelectedTechs] = useState<TechId[]>([]);
   const router = useRouter();
+  const { user } = useAuth();
+  const { toast } = useToast();
 
   // Détecter les technologies quand le prompt change
   useEffect(() => {
@@ -49,7 +53,10 @@ export const PromptForm: React.FC<PromptFormProps> = ({ onSubmit }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!prompt.trim()) return;
-
+    if (!user) {
+      alert("Il est nécessaire de se connecter. Si vous n'avez pas de compte, veuillez en créer un.");
+      return;
+    }
     setIsSubmitting(true);
     
     try {

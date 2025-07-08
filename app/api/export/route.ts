@@ -13,7 +13,9 @@ export async function POST(req: NextRequest) {
     
     // Ajouter chaque fichier au ZIP
     files.forEach((file: any) => {
-      zip.file(file.path, file.content);
+      // Utilise file.content si présent, sinon file.description
+      const fileContent = file.content || file.description || '';
+      zip.file(file.path, fileContent);
     });
 
     // Générer le ZIP

@@ -19,9 +19,11 @@ import {
 
 interface FileListProps {
   files: ProjectFile[];
+  onSelectFile?: (file: ProjectFile) => void;
+  selectedFile?: ProjectFile | null;
 }
 
-export const FileList: React.FC<FileListProps> = ({ files }) => {
+export const FileList: React.FC<FileListProps> = ({ files, onSelectFile, selectedFile }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedType, setSelectedType] = useState<string>('all');
 
@@ -115,7 +117,8 @@ export const FileList: React.FC<FileListProps> = ({ files }) => {
             filteredFiles.map((file) => (
               <div
                 key={file.id}
-                className="flex items-center justify-between p-4 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors duration-200 cursor-pointer group"
+                className={`flex items-center justify-between p-4 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors duration-200 cursor-pointer group ${selectedFile?.id === file.id ? 'bg-blue-100' : ''}`}
+                onClick={() => onSelectFile?.(file)}
               >
                 <div className="flex items-center space-x-3 min-w-0 flex-1">
                   {getFileIcon(file.type)}

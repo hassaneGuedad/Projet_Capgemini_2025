@@ -6,6 +6,9 @@ const db = getFirestore();
 
 // Helper function to check if user is authenticated
 const checkAuth = () => {
+  if (!auth) {
+    throw new Error('Firebase Auth is not initialized.');
+  }
   const user = auth.currentUser;
   if (!user) {
     throw new Error('User not authenticated');

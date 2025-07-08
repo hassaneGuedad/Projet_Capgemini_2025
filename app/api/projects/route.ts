@@ -1,6 +1,8 @@
 import { getUserProjects, deleteProject } from "@/services/firestore";
 import { NextRequest, NextResponse } from "next/server";
 
+//Gestion des projets (récupération et suppression
+
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const userId = searchParams.get("userId");
