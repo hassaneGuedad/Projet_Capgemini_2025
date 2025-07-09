@@ -19,7 +19,7 @@ export interface ProjectPlan {
 export interface ProjectFile {
   id: string;
   name: string;
-  type: 'component' | 'page' | 'api' | 'config' | 'style';
+  type: 'component' | 'page' | 'api' | 'config' | 'style' | 'folder';
   path: string;
   size: string;
   lastModified: Date;
