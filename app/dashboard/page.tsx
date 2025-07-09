@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { PlanOverview } from '@/components/PlanOverview';
@@ -21,11 +21,16 @@ import {
   Loader2,
   AlertCircle,
   CheckCircle2,
-  Clock
+  Clock,
+  Clipboard
 } from 'lucide-react';
 import { getUserPlanDrafts, deletePlanDraft } from '@/services/firestore';
 import toast from 'react-hot-toast';
 import DeepseekProvider from '@/lib/modules/llm/providers/deepseek';
+import { CodeEditor } from '@/components/CodeEditor';
+import { MonacoCodeEditor } from '@/components/MonacoCodeEditor';
+import { FileExplorer } from '@/components/FileExplorer';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 
 type GenerationStatus = 'idle' | 'generating' | 'completed';
 
@@ -53,6 +58,15 @@ export default function Dashboard() {
   const [page, setPage] = useState(1);
   const pageSize = 5;
   const [selectedFile, setSelectedFile] = useState<ProjectFile | null>(null);
+  const [editorCode, setEditorCode] = useState<string>('');
+  const [fileCode, setFileCode] = useState<string>('');
+  const saveTimeout = useRef<NodeJS.Timeout | null>(null);
+  const [previewError, setPreviewError] = useState<string | null>(null);
+  // Onglets ouverts (multi-fichiers)
+  const [openTabs, setOpenTabs] = useState<ProjectFile[]>([]);
+  const [activeTab, setActiveTab] = useState<string | null>(null);
+  // Dialogue de confirmation suppression
+  const [deleteConfirm, setDeleteConfirm] = useState<{file: ProjectFile | null, open: boolean}>({file: null, open: false});
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -109,6 +123,68 @@ export default function Dashboard() {
       }
     }
   }, [searchParams, router]);
+
+  useEffect(() => {
+    if (files.length > 0) {
+      setEditorCode(files[0].description || '');
+    }
+  }, [files]);
+
+  useEffect(() => {
+    if (selectedFile) {
+      setFileCode(selectedFile.description ?? '');
+    }
+  }, [selectedFile]);
+
+  // Synchronisation de l'onglet actif avec selectedFile et fileCode
+  useEffect(() => {
+    if (!activeTab) return;
+    // Si déjà synchronisé, ne rien faire
+    if (selectedFile?.id === activeTab) return;
+    const file = openTabs.find(f => f.id === activeTab);
+    if (file) {
+      setSelectedFile(file);
+      setFileCode(file.description ?? '');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab]);
+
+  // Sauvegarde manuelle
+  const handleSave = () => {
+    if (selectedFile) {
+      localStorage.setItem('file_' + selectedFile.path, fileCode);
+      // Met à jour le contenu dans le state files
+      setFiles(prev =>
+        prev.map(f =>
+          f.id === selectedFile.id
+            ? { ...f, description: fileCode }
+            : f
+        )
+      );
+      toast.success('Fichier sauvegardé !');
+    }
+  };
+
+  // Sauvegarde auto toutes les 5s si code modifié
+  useEffect(() => {
+    if (!selectedFile) return;
+    if (saveTimeout.current) clearTimeout(saveTimeout.current);
+    saveTimeout.current = setTimeout(() => {
+      localStorage.setItem('file_' + selectedFile.path, fileCode);
+      // Met à jour le contenu dans le state files
+      setFiles(prev =>
+        prev.map(f =>
+          f.id === selectedFile.id
+            ? { ...f, description: fileCode }
+            : f
+        )
+      );
+      toast.success('Sauvegarde automatique !');
+    }, 5000);
+    return () => {
+      if (saveTimeout.current) clearTimeout(saveTimeout.current);
+    };
+  }, [fileCode, selectedFile]);
 
   const mapToProjectFiles = (generatedFiles: GeneratedFile[]): ProjectFile[] => {
     return generatedFiles.map((file, index) => ({
@@ -246,6 +322,81 @@ export default function Dashboard() {
     }
   };
 
+  // Gestion création, suppression, renommage fichiers
+  const handleCreateFile = (name: string) => {
+    setFiles(prev => [
+      ...prev,
+      {
+        id: `file-${Date.now()}`,
+        name,
+        path: name,
+        type: 'page',
+        size: '0 B',
+        lastModified: new Date(),
+        description: '',
+      }
+    ]);
+  };
+  const handleCreateFolder = (name: string) => {
+    setFiles(prev => [
+      ...prev,
+      {
+        id: `folder-${Date.now()}`,
+        name,
+        path: name.endsWith('/') ? name : name + '/',
+        type: 'folder',
+        size: '',
+        lastModified: new Date(),
+        description: '',
+      }
+    ]);
+  };
+  const handleRenameFile = (file: ProjectFile, newName: string) => {
+    setFiles(prev =>
+      prev.map(f =>
+        f.id === file.id
+          ? { ...f, name: newName, path: newName }
+          : f
+      )
+    );
+  };
+  // Sélectionner un fichier (ouvre un onglet si pas déjà ouvert)
+  const handleSelectFile = (file: ProjectFile) => {
+    setSelectedFile(file);
+    setFileCode(file.description ?? '');
+    if (!openTabs.find(f => f.id === file.id)) {
+      setOpenTabs(tabs => [...tabs, file]);
+    }
+    if (activeTab !== file.id) {
+      setActiveTab(file.id);
+    }
+  };
+  // Fermer un onglet
+  const handleCloseTab = (fileId: string) => {
+    setOpenTabs(tabs => tabs.filter(f => f.id !== fileId));
+    if (activeTab === fileId) {
+      // Si on ferme l'onglet actif, activer le précédent ou le suivant
+      const idx = openTabs.findIndex(f => f.id === fileId);
+      const next = openTabs[idx + 1] || openTabs[idx - 1] || null;
+      setActiveTab(next ? next.id : null);
+      setSelectedFile(next || null);
+      setFileCode(next?.description ?? '');
+    }
+  };
+  // Confirmation suppression
+  const handleDeleteFile = (file: ProjectFile) => {
+    setDeleteConfirm({file, open: true});
+  };
+  const confirmDelete = () => {
+    if (deleteConfirm.file) {
+      setFiles(prev => prev.filter(f => f.id !== deleteConfirm.file!.id));
+      setOpenTabs(tabs => tabs.filter(f => f.id !== deleteConfirm.file!.id));
+      if (selectedFile?.id === deleteConfirm.file.id) setSelectedFile(null);
+    }
+    setDeleteConfirm({file: null, open: false});
+  };
+  const cancelDelete = () => setDeleteConfirm({file: null, open: false});
+
   if (isLoading || generationStatus === STATUS.GENERATING) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center">
@@ -301,6 +452,54 @@ export default function Dashboard() {
         return 'bg-gray-100 text-gray-700 border-gray-200';
     }
   };
+
+  const isHtmlFile = selectedFile && selectedFile.name.endsWith('.html');
+  const isReactFile = selectedFile && (selectedFile.name.endsWith('.jsx') || selectedFile.name.endsWith('.tsx') || (selectedFile.name.endsWith('.js') && fileCode.includes('React')));
+
+  function getLivePreviewSrcDoc() {
+    if (isHtmlFile) {
+      setPreviewError(null);
+      return fileCode;
+    }
+    if (isReactFile) {
+      // Sanitize code: remove import/export
+      const sanitizedCode = fileCode
+        .replace(/^export default /gm, '')
+        .replace(/^import .*/gm, '')
+        .replace(/^export .*/gm, '');
+      // Ajout d'un wrapper pour capturer les erreurs
+      return `<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>body { font-family: sans-serif; padding: 1rem; }</style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <div id="preview-error" style="color: red; font-weight: bold; margin-top: 1em;"></div>
+    <script type="text/babel">
+      try {
+        ${sanitizedCode}
+        let rootComponent = typeof App !== 'undefined' ? <App /> : (typeof exports !== 'undefined' && exports.default ? exports.default : null);
+        if (rootComponent) {
+          const root = ReactDOM.createRoot(document.getElementById('root'));
+          root.render(rootComponent);
+        } else {
+          document.getElementById('preview-error').textContent = 'Aucun composant App trouvé.';
+        }
+      } catch (e) {
+        document.getElementById('preview-error').textContent = 'Erreur dans la preview : ' + e.message;
+      }
+    </script>
+  </body>
+</html>`;
+    }
+    setPreviewError(null);
+    return '';
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
@@ -373,13 +572,65 @@ export default function Dashboard() {
           {/* Left Column - Plan Overview */}
           <div className="lg:col-span-2 space-y-8">
             {plan && !planValidated && <PlanOverview plan={plan} onAllStepsValidated={handlePlanValidated} />}
-            {files.length > 0 && <FileList files={files} onSelectFile={setSelectedFile} selectedFile={selectedFile} />}
-            {selectedFile && (
-              <div className="mt-6">
-                <h3 className="font-bold mb-2">{selectedFile.name}</h3>
-                <pre className="bg-gray-900 text-white p-4 rounded overflow-x-auto">
-                  {selectedFile.description}
-                </pre>
+            {files.length > 0 && (
+              <div className="flex">
+                <FileExplorer
+                  files={files}
+                  onSelectFile={handleSelectFile}
+                  selectedFile={selectedFile}
+                  onRenameFile={handleRenameFile}
+                  onDeleteFile={handleDeleteFile}
+                  onCreateFile={handleCreateFile}
+                  onCreateFolder={handleCreateFolder}
+                />
+                <div className="flex-1 ml-6">
+                  {selectedFile && (
+                    <div className="mt-6">
+                      <div className="flex items-center mb-2">
+                        <h3 className="font-bold mr-4">{selectedFile.name}</h3>
+                        <button
+                          className="flex items-center px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded text-sm ml-auto"
+                          onClick={async () => {
+                            await navigator.clipboard.writeText(fileCode);
+                          }}
+                        >
+                          <Clipboard className="w-4 h-4 mr-1" /> Copier
+                        </button>
+                      </div>
+                      <MonacoCodeEditor
+                        value={fileCode}
+                        onChange={setFileCode}
+                        language={selectedFile.name.endsWith('.js') || selectedFile.name.endsWith('.jsx') || selectedFile.name.endsWith('.tsx') ? 'javascript' : 'html'}
+                        height="600px"
+                      />
+                      {/* Notice preview React */}
+                      {selectedFile.name.endsWith('.js') || selectedFile.name.endsWith('.jsx') || selectedFile.name.endsWith('.tsx') ? (
+                        <div className="text-xs text-gray-600 mb-2">
+                          <b>Note :</b> Pour la prévisualisation React, tous les composants doivent être définis dans le même fichier, sans import/export. Le composant d'entrée doit s'appeler <code>App</code>.
+                        </div>
+                      ) : null}
+                      {/* Preview + gestion erreur */}
+                      <div className="border rounded-lg overflow-hidden bg-white shadow">
+                        {(selectedFile.name.endsWith('.html') || selectedFile.name.endsWith('.js') || selectedFile.name.endsWith('.jsx') || selectedFile.name.endsWith('.tsx')) ? (
+                          <>
+                            <iframe
+                              srcDoc={getLivePreviewSrcDoc()}
+                              title="Live Preview"
+                              sandbox="allow-scripts allow-same-origin"
+                              style={{ width: '100%', height: 400, border: 'none' }}
+                            />
+                            {/* Affichage de l'erreur de preview si présente */}
+                            {previewError && (
+                              <div className="text-red-600 text-xs mt-2">{previewError}</div>
+                            )}
+                          </>
+                        ) : (
+                          <div className="p-8 text-gray-400 text-center">Aucune prévisualisation disponible pour ce type de fichier.</div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
             {/* Conseils en bas à gauche */}
@@ -505,6 +756,19 @@ export default function Dashboard() {
             <div className="flex gap-2 mt-4">
               <button onClick={doDeleteDraft} className="bg-red-600 text-white px-4 py-2 rounded">Oui, supprimer</button>
               <button onClick={cancelDeleteDraft} className="bg-gray-200 px-4 py-2 rounded">Annuler</button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Dialogue de confirmation suppression */}
+      {deleteConfirm.open && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-30">
+          <div className="bg-white rounded shadow-lg p-6 min-w-[300px]">
+            <h3 className="font-bold text-lg mb-4">Confirmer la suppression</h3>
+            <p>Voulez-vous vraiment supprimer <b>{deleteConfirm.file?.name}</b> ? Cette action est irréversible.</p>
+            <div className="flex justify-end gap-2 mt-6">
+              <button className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300" onClick={cancelDelete}>Annuler</button>
+              <button className="px-4 py-2 rounded bg-red-500 text-white hover:bg-red-600" onClick={confirmDelete}>Supprimer</button>
             </div>
           </div>
         </div>
