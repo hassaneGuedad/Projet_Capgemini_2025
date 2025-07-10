@@ -174,7 +174,7 @@ export async function updateProject(projectId: string, data: Partial<Project>) {
   });
 }
 
-export async function savePlanDraft({ userId, prompt, plan }: { userId: string; prompt: string; plan: any }) {
+export async function savePlanDraft({ userId, prompt, plan, files, chatHistory }: { userId: string; prompt: string; plan: any; files: any[]; chatHistory?: { role: 'user' | 'assistant'; content: string }[] }) {
   const user = checkAuth();
   
   return retryOperation(async () => {
@@ -183,6 +183,8 @@ export async function savePlanDraft({ userId, prompt, plan }: { userId: string; 
         userId: user.uid,
         prompt,
         plan,
+        files,
+        ...(chatHistory ? { chatHistory } : {}),
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       });
@@ -190,7 +192,7 @@ export async function savePlanDraft({ userId, prompt, plan }: { userId: string; 
     } catch (error: any) {
       // If online save fails, save offline
       if (error.message?.includes('unavailable') || error.code === 'unavailable') {
-        saveOffline(`planDraft_${Date.now()}`, { userId: user.uid, prompt, plan });
+        saveOffline(`planDraft_${Date.now()}`, { userId: user.uid, prompt, plan, files, ...(chatHistory ? { chatHistory } : {}) });
         throw new Error('Saved offline due to connectivity issues. Will sync when online.');
       }
       handleFirestoreError(error, 'save plan draft');

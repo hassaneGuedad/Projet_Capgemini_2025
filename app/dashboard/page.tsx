@@ -22,15 +22,22 @@ import {
   AlertCircle,
   CheckCircle2,
   Clock,
-  Clipboard
+  Clipboard,
+  Folder
 } from 'lucide-react';
-import { getUserPlanDrafts, deletePlanDraft } from '@/services/firestore';
+import { getUserPlanDrafts, deletePlanDraft, savePlanDraft } from '@/services/firestore';
 import toast from 'react-hot-toast';
 import DeepseekProvider from '@/lib/modules/llm/providers/deepseek';
 import { CodeEditor } from '@/components/CodeEditor';
 import { MonacoCodeEditor } from '@/components/MonacoCodeEditor';
 import { FileExplorer } from '@/components/FileExplorer';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { ChatbotPanel } from '@/components/ChatbotPanel';
+import { ChatbotFloatingButton } from '@/components/ChatbotFloatingButton';
+import { SavedPlansFloatingButton } from '@/components/SavedPlansFloatingButton';
+import { SavedPlansPanel } from '@/components/SavedPlansPanel';
+import { QuickActionsFloatingButton } from '@/components/QuickActionsFloatingButton';
+import { QuickActionsPanel } from '@/components/QuickActionsPanel';
 
 type GenerationStatus = 'idle' | 'generating' | 'completed';
 
@@ -67,6 +74,10 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState<string | null>(null);
   // Dialogue de confirmation suppression
   const [deleteConfirm, setDeleteConfirm] = useState<{file: ProjectFile | null, open: boolean}>({file: null, open: false});
+  const [isChatbotOpen, setIsChatbotOpen] = useState(false);
+  const [isPlansPanelOpen, setIsPlansPanelOpen] = useState(false);
+  const [isQuickActionsOpen, setIsQuickActionsOpen] = useState(false);
+  const [chatHistory, setChatHistory] = useState<{role: 'user' | 'assistant', content: string}[]>([]);
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -131,7 +142,7 @@ export default function Dashboard() {
   }, [files]);
 
   useEffect(() => {
-    if (selectedFile) {
+    if (selectedFile && selectedFile.description !== fileCode) {
       setFileCode(selectedFile.description ?? '');
     }
   }, [selectedFile]);
@@ -265,9 +276,10 @@ export default function Dashboard() {
   const handleLoadDraft = (draft: any) => {
     setPlan(draft.plan);
     setPlanValidated(false);
-    setFiles([]);
+    setFiles(draft.files || []);
     setProgress(50);
     setCurrentPrompt(draft.prompt);
+    setChatHistory(draft.chatHistory || []); // <-- ici
     localStorage.setItem('editedPlan', JSON.stringify(draft.plan));
     localStorage.setItem('currentPrompt', draft.prompt);
     toast.success('Plan chargé avec succès !');
@@ -458,7 +470,6 @@ export default function Dashboard() {
 
   function getLivePreviewSrcDoc() {
     if (isHtmlFile) {
-      setPreviewError(null);
       return fileCode;
     }
     if (isReactFile) {
@@ -497,9 +508,18 @@ export default function Dashboard() {
   </body>
 </html>`;
     }
-    setPreviewError(null);
     return '';
   }
+
+  const handleSavePlan = async () => {
+    if (!user) return;
+    try {
+      await savePlanDraft({ userId: user.id, prompt: currentPrompt, plan, files, chatHistory });
+      toast.success('Plan sauvegardé dans vos brouillons !');
+    } catch (e) {
+      toast.error('Erreur lors de la sauvegarde du plan.');
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
@@ -514,10 +534,6 @@ export default function Dashboard() {
               </p>
             </div>
             <div className="flex items-center space-x-4">
-              <Button variant="outline" className="flex items-center space-x-2">
-                <Settings className="h-4 w-4" />
-                <span>Paramètres</span>
-              </Button>
               <Button variant="outline" className="flex items-center space-x-2">
                 <Share2 className="h-4 w-4" />
                 <span>Partager</span>
@@ -557,10 +573,6 @@ export default function Dashboard() {
                     <Progress value={progress} className="w-32" />
                     <span className="text-sm font-medium">{progress}%</span>
                   </div>
-                  <Button size="sm" className="flex items-center space-x-2">
-                    <Play className="h-3 w-3" />
-                    <span>Aperçu</span>
-                  </Button>
                 </div>
               </div>
             </CardContent>
@@ -568,22 +580,24 @@ export default function Dashboard() {
         </div>
 
         {/* Main Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Column - Plan Overview */}
-          <div className="lg:col-span-2 space-y-8">
+        <div className="grid grid-cols-1 lg:grid-cols-7 gap-8">
+          {/* Left Column - Plan Overview et éditeur élargi */}
+          <div className="lg:col-span-7 space-y-8">
             {plan && !planValidated && <PlanOverview plan={plan} onAllStepsValidated={handlePlanValidated} />}
             {files.length > 0 && (
               <div className="flex">
-                <FileExplorer
-                  files={files}
-                  onSelectFile={handleSelectFile}
-                  selectedFile={selectedFile}
-                  onRenameFile={handleRenameFile}
-                  onDeleteFile={handleDeleteFile}
-                  onCreateFile={handleCreateFile}
-                  onCreateFolder={handleCreateFolder}
-                />
-                <div className="flex-1 ml-6">
+                <div className="w-64 flex-shrink-0">
+                  <FileExplorer
+                    files={files}
+                    onSelectFile={handleSelectFile}
+                    selectedFile={selectedFile}
+                    onRenameFile={handleRenameFile}
+                    onDeleteFile={handleDeleteFile}
+                    onCreateFile={handleCreateFile}
+                    onCreateFolder={handleCreateFolder}
+                  />
+                </div>
+                <div className="flex-1 ml-24">
                   {selectedFile && (
                     <div className="mt-6">
                       <div className="flex items-center mb-2">
@@ -596,6 +610,12 @@ export default function Dashboard() {
                         >
                           <Clipboard className="w-4 h-4 mr-1" /> Copier
                         </button>
+                        <Button
+                          className="ml-2 bg-blue-600 hover:bg-blue-700 text-white"
+                          onClick={handleSavePlan}
+                        >
+                          Sauvegarder ce plan
+                        </Button>
                       </div>
                       <MonacoCodeEditor
                         value={fileCode}
@@ -660,33 +680,9 @@ export default function Dashboard() {
 
           {/* Right Column - UI Preview et Actions rapides */}
           <div className="space-y-8">
-            {/* Quick Actions */}
-            <Card className="border-0 shadow-lg ml-8">
-              <CardHeader>
-                <CardTitle className="text-lg">Actions rapides</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <Button variant="outline" className="w-full justify-start">
-                  <Download className="h-4 w-4 mr-2" />
-                  Télécharger le code source
-                </Button>
-                <Button variant="outline" className="w-full justify-start">
-                  <Play className="h-4 w-4 mr-2" />
-                  Lancer l'aperçu
-                </Button>
-                <Button variant="outline" className="w-full justify-start">
-                  <Settings className="h-4 w-4 mr-2" />
-                  Modifier la configuration
-                </Button>
-                <Button variant="outline" className="w-full justify-start">
-                  <Share2 className="h-4 w-4 mr-2" />
-                  Partager le projet
-                </Button>
-              </CardContent>
-            </Card>
-
             {/* Historique des plans brouillons */}
-            {user && planDrafts.length > 0 && (
+            {/* (SUPPRIMER tout ce bloc) */}
+            {/* {user && planDrafts.length > 0 && (
               <div className="bg-white rounded-lg shadow p-4 ml-8">
                 <h2 className="text-lg font-semibold mb-4">Mes plans sauvegardés</h2>
                 <div className="flex gap-2 mb-2">
@@ -743,7 +739,7 @@ export default function Dashboard() {
                   </button>
                 </div>
                 </div>
-            )}
+            )} */}
           </div>
         </div>
       </div>
@@ -772,6 +768,44 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
+      )}
+      {isChatbotOpen && (
+        <ChatbotPanel
+          selectedFile={selectedFile}
+          fileCode={fileCode}
+          onCodeUpdate={setFileCode}
+          onClose={() => setIsChatbotOpen(false)}
+          chatHistory={chatHistory}
+          setChatHistory={setChatHistory}
+        />
+      )}
+      {/* Bouton flottant et Chatbot latéral */}
+      {!isChatbotOpen && !isPlansPanelOpen && !isQuickActionsOpen && (
+        <ChatbotFloatingButton onClick={() => setIsChatbotOpen(true)} />
+      )}
+      {!isPlansPanelOpen && !isChatbotOpen && !isQuickActionsOpen && (
+        <SavedPlansFloatingButton onClick={() => setIsPlansPanelOpen(true)} />
+      )}
+      {isPlansPanelOpen && (
+        <SavedPlansPanel
+          plans={planDrafts}
+          onLoad={handleLoadDraft}
+          onDelete={handleDeleteDraft}
+          onClose={() => setIsPlansPanelOpen(false)}
+        />
+      )}
+      {/* Quick Actions bouton et panneau latéral */}
+      {!isQuickActionsOpen && !isChatbotOpen && !isPlansPanelOpen && (
+        <QuickActionsFloatingButton onClick={() => setIsQuickActionsOpen(true)} />
+      )}
+      {isQuickActionsOpen && (
+        <QuickActionsPanel
+          onClose={() => setIsQuickActionsOpen(false)}
+          onDownload={handleExportProject}
+          onPreview={() => { /* Ajoute ici la logique d'aperçu */ }}
+          onSettings={() => { /* Ajoute ici la logique de config */ }}
+          onShare={() => { /* Ajoute ici la logique de partage */ }}
+        />
       )}
     </div>
   );
