@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import { PromptForm } from '@/components/PromptForm';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -14,6 +14,7 @@ import {
   Users,
   Clock
 } from 'lucide-react';
+
 
 export default function Home() {
   const features = [

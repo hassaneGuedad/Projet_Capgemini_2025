@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Sparkles, Send, Loader2, X } from 'lucide-react';
+import { Sparkles, Send, Loader2, X, Mic } from 'lucide-react';
 import { detectTechnologies, getTechDisplayName, getTechIcon, type TechId } from '@/lib/tech-detector';
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
@@ -23,6 +23,8 @@ export const PromptForm: React.FC<PromptFormProps> = ({ onSubmit }) => {
   const router = useRouter();
   const { user } = useAuth();
   const { toast } = useToast();
+  const [isListening, setIsListening] = useState(false);
+  const recognitionRef = React.useRef<any>(null);
 
   // Détecter les technologies quand le prompt change
   useEffect(() => {
@@ -49,6 +51,34 @@ export const PromptForm: React.FC<PromptFormProps> = ({ onSubmit }) => {
     "Construire une API REST avec Express et PostgreSQL",
     "Créer une application de chat en temps réel avec Vue.js et Firebase"
   ];
+
+  const handleVoiceInput = () => {
+    if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+      toast({ title: 'Erreur', description: 'La reconnaissance vocale n\'est pas supportée par ce navigateur.' });
+      return;
+    }
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!recognitionRef.current) {
+      recognitionRef.current = new SpeechRecognition();
+      recognitionRef.current.lang = 'fr-FR';
+      recognitionRef.current.continuous = false;
+      recognitionRef.current.interimResults = false;
+      recognitionRef.current.onresult = (event: any) => {
+        const transcript = event.results[0][0].transcript;
+        setPrompt(prev => prev ? prev + ' ' + transcript : transcript);
+        setIsListening(false);
+      };
+      recognitionRef.current.onerror = () => setIsListening(false);
+      recognitionRef.current.onend = () => setIsListening(false);
+    }
+    if (!isListening) {
+      setIsListening(true);
+      recognitionRef.current.start();
+    } else {
+      setIsListening(false);
+      recognitionRef.current.stop();
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -108,12 +138,23 @@ export const PromptForm: React.FC<PromptFormProps> = ({ onSubmit }) => {
       <CardContent className="space-y-6">
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Textarea
-              className="min-h-[120px] mb-4"
-              placeholder="Décrivez votre projet en détail..."
-              value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
-            />
+            <div className="flex items-center gap-2">
+              <Textarea
+                className="min-h-[120px] mb-4"
+                placeholder="Décrivez votre projet en détail..."
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+              />
+              <Button
+                type="button"
+                variant={isListening ? 'secondary' : 'outline'}
+                className={`h-12 w-12 flex-shrink-0 ${isListening ? 'animate-pulse bg-blue-100' : ''}`}
+                onClick={handleVoiceInput}
+                aria-label="Saisie vocale"
+              >
+                <Mic className={`h-6 w-6 ${isListening ? 'text-blue-600' : 'text-gray-500'}`} />
+              </Button>
+            </div>
             
             {detectedTechs.length > 0 && (
               <div className="mb-4">
