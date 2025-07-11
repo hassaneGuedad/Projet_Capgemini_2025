@@ -38,6 +38,7 @@ import { SavedPlansFloatingButton } from '@/components/SavedPlansFloatingButton'
 import { SavedPlansPanel } from '@/components/SavedPlansPanel';
 import { QuickActionsFloatingButton } from '@/components/QuickActionsFloatingButton';
 import { QuickActionsPanel } from '@/components/QuickActionsPanel';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from '@/components/ui/dialog';
 
 type GenerationStatus = 'idle' | 'generating' | 'completed';
 
@@ -78,6 +79,18 @@ export default function Dashboard() {
   const [isPlansPanelOpen, setIsPlansPanelOpen] = useState(false);
   const [isQuickActionsOpen, setIsQuickActionsOpen] = useState(false);
   const [chatHistory, setChatHistory] = useState<{role: 'user' | 'assistant', content: string}[]>([]);
+  const [isGitHubModalOpen, setIsGitHubModalOpen] = useState(false);
+  const [githubRepoName, setGithubRepoName] = useState('');
+  const [githubRepoPrivate, setGithubRepoPrivate] = useState(true);
+  const [githubToken, setGithubToken] = useState('');
+  const [githubLoading, setGithubLoading] = useState(false);
+  const [githubResult, setGithubResult] = useState<string|null>(null);
+  const [githubError, setGithubError] = useState<string|null>(null);
+  const [isNetlifyModalOpen, setIsNetlifyModalOpen] = useState(false);
+  const [netlifyToken, setNetlifyToken] = useState('');
+  const [netlifyLoading, setNetlifyLoading] = useState(false);
+  const [netlifyResult, setNetlifyResult] = useState<string|null>(null);
+  const [netlifyError, setNetlifyError] = useState<string|null>(null);
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -805,8 +818,134 @@ export default function Dashboard() {
           onPreview={() => { /* Ajoute ici la logique d'aperçu */ }}
           onSettings={() => { /* Ajoute ici la logique de config */ }}
           onShare={() => { /* Ajoute ici la logique de partage */ }}
+          onSaveToGitHub={() => {
+            setGithubRepoName('mon-projet');
+            setIsGitHubModalOpen(true);
+          }}
+          onDeployToNetlify={() => {
+            setIsNetlifyModalOpen(true);
+          }}
         />
       )}
+      <Dialog open={isGitHubModalOpen} onOpenChange={setIsGitHubModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Sauvegarder sur GitHub</DialogTitle>
+            <DialogDescription>
+              Crée un dépôt GitHub et pousse les fichiers générés.
+            </DialogDescription>
+          </DialogHeader>
+          <form
+            onSubmit={async (e) => {
+              e.preventDefault();
+              setGithubLoading(true);
+              setGithubError(null);
+              setGithubResult(null);
+              try {
+                const res = await fetch('/api/github/create-repo', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    repoName: githubRepoName,
+                    isPrivate: githubRepoPrivate,
+                    token: githubToken,
+                    files,
+                  }),
+                });
+                const data = await res.json();
+                if (res.ok) {
+                  setGithubResult(data.url);
+                } else {
+                  setGithubError(data.error || 'Erreur inconnue');
+                }
+              } catch (err: any) {
+                setGithubError(err.message || 'Erreur inconnue');
+              } finally {
+                setGithubLoading(false);
+              }
+            }}
+            className="space-y-4"
+          >
+            <div>
+              <label className="block text-sm font-medium">Nom du dépôt</label>
+              <input type="text" value={githubRepoName} onChange={e => setGithubRepoName(e.target.value)} className="w-full border rounded px-2 py-1" required />
+            </div>
+            <div>
+              <label className="block text-sm font-medium">Visibilité</label>
+              <select value={githubRepoPrivate ? 'private' : 'public'} onChange={e => setGithubRepoPrivate(e.target.value === 'private')} className="w-full border rounded px-2 py-1">
+                <option value="public">Public</option>
+                <option value="private">Privé</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium">Token GitHub (scope repo)</label>
+              <input type="password" value={githubToken} onChange={e => setGithubToken(e.target.value)} className="w-full border rounded px-2 py-1" required />
+              <span className="text-xs text-muted-foreground">Génère un token sur https://github.com/settings/tokens (scope repo)</span>
+            </div>
+            {githubError && <div className="text-red-500 text-sm">{githubError}</div>}
+            {githubResult && <div className="text-green-600 text-sm">Dépôt créé : <a href={githubResult} target="_blank" rel="noopener noreferrer" className="underline">{githubResult}</a></div>}
+            <DialogFooter>
+              <Button type="submit" disabled={githubLoading}>{githubLoading ? 'Envoi...' : 'Créer et pousser'}</Button>
+              <DialogClose asChild>
+                <Button type="button" variant="outline">Annuler</Button>
+              </DialogClose>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={isNetlifyModalOpen} onOpenChange={setIsNetlifyModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Déployer sur Netlify</DialogTitle>
+            <DialogDescription>
+              Déploie instantanément ce projet sur Netlify. Un token personnel Netlify est requis.
+            </DialogDescription>
+          </DialogHeader>
+          <form
+            onSubmit={async (e) => {
+              e.preventDefault();
+              setNetlifyLoading(true);
+              setNetlifyError(null);
+              setNetlifyResult(null);
+              try {
+                const res = await fetch('/api/netlify/deploy', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    token: netlifyToken,
+                    files,
+                  }),
+                });
+                const data = await res.json();
+                if (res.ok) {
+                  setNetlifyResult(data.url);
+                } else {
+                  setNetlifyError(data.error || 'Erreur inconnue');
+                }
+              } catch (err: any) {
+                setNetlifyError(err.message || 'Erreur inconnue');
+              } finally {
+                setNetlifyLoading(false);
+              }
+            }}
+            className="space-y-4"
+          >
+            <div>
+              <label className="block text-sm font-medium">Token Netlify personnel</label>
+              <input type="password" value={netlifyToken} onChange={e => setNetlifyToken(e.target.value)} className="w-full border rounded px-2 py-1" required />
+              <span className="text-xs text-muted-foreground">Génère un token sur https://app.netlify.com/user/applications/personal</span>
+            </div>
+            {netlifyError && <div className="text-red-500 text-sm">{netlifyError}</div>}
+            {netlifyResult && <div className="text-green-600 text-sm">Site déployé : <a href={netlifyResult} target="_blank" rel="noopener noreferrer" className="underline">{netlifyResult}</a></div>}
+            <DialogFooter>
+              <Button type="submit" disabled={netlifyLoading}>{netlifyLoading ? 'Déploiement...' : 'Déployer'}</Button>
+              <DialogClose asChild>
+                <Button type="button" variant="outline">Annuler</Button>
+              </DialogClose>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
