@@ -28,8 +28,7 @@ async function deployFiles(token: string, siteId: string, files: ProjectFile[]) 
   const form = new FormData();
   for (const file of files) {
     if (file.type !== 'folder') {
-      // file.path = chemin relatif, file.description = contenu
-      form.append('files[]', new Blob([file.description || ''], { type: 'text/plain' }), file.path);
+      form.append(file.path, new Blob([file.description || ''], { type: 'text/plain' }), file.name);
     }
   }
   const res = await fetch(`https://api.netlify.com/api/v1/sites/${siteId}/deploys`, {
@@ -42,20 +41,3 @@ async function deployFiles(token: string, siteId: string, files: ProjectFile[]) 
   if (!res.ok) throw new Error('Erreur déploiement Netlify: ' + (await res.text()));
   return res.json();
 }
-
-export async function POST(req: NextRequest) {
-  try {
-    const { token, files } = await req.json();
-    if (!token || !files) {
-      return NextResponse.json({ error: 'Paramètres manquants' }, { status: 400 });
-    }
-    // 1. Créer un site Netlify
-    const site = await createSite(token);
-    // 2. Déployer les fichiers
-    const deploy = await deployFiles(token, site.id, files);
-    // 3. Retourner l’URL du site
-    return NextResponse.json({ url: deploy.deploy_ssl_url || deploy.deploy_url || site.ssl_url || site.url });
-  } catch (e: any) {
-    return NextResponse.json({ error: e.message || 'Erreur inconnue' }, { status: 500 });
-  }
-} 

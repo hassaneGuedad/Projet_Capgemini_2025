@@ -1,10 +1,13 @@
+// Importation des fonctions nécessaires de Firebase Firestore
 import { getFirestore, collection, addDoc, getDocs, query, where, deleteDoc, doc, updateDoc, onSnapshot } from "firebase/firestore";
+// Importation des types et de l'authentification
 import { Project } from "@/types/agents";
 import { auth } from "@/lib/firebase";
 
+// Initialisation de l'instance Firestore
 const db = getFirestore();
 
-// Helper function to check if user is authenticated
+// Fonction d'assistance pour vérifier si l'utilisateur est authentifié
 const checkAuth = () => {
   if (!auth) {
     throw new Error('Firebase Auth is not initialized.');

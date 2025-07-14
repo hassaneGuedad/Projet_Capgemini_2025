@@ -916,11 +916,17 @@ export default function Dashboard() {
                     files,
                   }),
                 });
-                const data = await res.json();
-                if (res.ok) {
+                let data: any = null;
+                let text = await res.text();
+                try {
+                  data = text ? JSON.parse(text) : {};
+                } catch (e) {
+                  data = { error: 'Réponse du serveur non valide.' };
+                }
+                if (res.ok && data.url) {
                   setNetlifyResult(data.url);
                 } else {
-                  setNetlifyError(data.error || 'Erreur inconnue');
+                  setNetlifyError(data.error || data.message || `Erreur HTTP ${res.status}`);
                 }
               } catch (err: any) {
                 setNetlifyError(err.message || 'Erreur inconnue');
