@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { PromptForm } from '@/components/PromptForm';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -46,6 +46,39 @@ export default function Home() {
     { icon: <Clock className="h-5 w-5" />, value: '80%', label: 'Temps économisé' },
     { icon: <TrendingUp className="h-5 w-5" />, value: '4.9/5', label: 'Satisfaction' }
   ];
+
+  // Ajout pour la recherche de code
+  const [searchInput, setSearchInput] = useState('');
+  type SearchResult = { file: string; snippet: string; startLine: number };
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [searchError, setSearchError] = useState('');
+
+  const handleSearch = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSearchError('');
+    setSearchResults([]);
+    if (!searchInput.trim().toLowerCase().startsWith('/search ')) return;
+    const query = searchInput.replace(/^\/search /i, '').trim();
+    if (!query) return;
+    setSearchLoading(true);
+    try {
+      const res = await fetch('/api/code-search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query }),
+      });
+      const data = await res.json();
+      if (data.results && data.results.length > 0) {
+        setSearchResults(data.results as SearchResult[]);
+      } else {
+        setSearchError('Aucun résultat trouvé.');
+      }
+    } catch (e) {
+      setSearchError("Erreur lors de la recherche.");
+    }
+    setSearchLoading(false);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
