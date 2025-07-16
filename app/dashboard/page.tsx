@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useMemo } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { PlanOverview } from '@/components/PlanOverview';
@@ -91,6 +91,24 @@ export default function Dashboard() {
   const [netlifyLoading, setNetlifyLoading] = useState(false);
   const [netlifyResult, setNetlifyResult] = useState<string|null>(null);
   const [netlifyError, setNetlifyError] = useState<string|null>(null);
+  const [currentPlanId, setCurrentPlanId] = useState<string | null>(null);
+
+  // --- GESTION HISTORIQUE CHAT PAR PROJET ---
+  // Utilitaire pour générer une clé unique d'historique (id de plan ou hash du prompt)
+  function getChatHistoryKey(planId: string | null): string {
+    return planId ? `chatHistory_${planId}` : 'chatHistory_default';
+  }
+  const chatHistoryKey = useMemo(() => getChatHistoryKey(currentPlanId), [currentPlanId]);
+  useEffect(() => {
+    const saved = localStorage.getItem(chatHistoryKey);
+    setChatHistory(saved ? JSON.parse(saved) : []);
+    // eslint-disable-next-line
+  }, [chatHistoryKey]);
+  useEffect(() => {
+    localStorage.setItem(chatHistoryKey, JSON.stringify(chatHistory));
+    // eslint-disable-next-line
+  }, [chatHistory, chatHistoryKey]);
+  // --- FIN GESTION HISTORIQUE ---
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -105,6 +123,8 @@ export default function Dashboard() {
       generatePlanFromPrompt(prompt)
         .then((result) => {
           setPlan(result.plan || result);
+          const newPlanId = (result.plan && result.plan.id) || (result.id) || (result.planId) || (result.plan && result.plan._id) || null;
+          setCurrentPlanId(newPlanId || hashPrompt(prompt));
           setGenerationStatus(STATUS.IDLE);
           setProgress(50);
         })
@@ -133,7 +153,8 @@ export default function Dashboard() {
       try {
         const decodedPlan = JSON.parse(atob(sharedPlan));
         setPlan(decodedPlan.plan);
-        setCurrentPrompt(decodedPlan.prompt);
+        const sharedPlanId = (decodedPlan.plan && decodedPlan.plan.id) || (decodedPlan.id) || (decodedPlan.planId) || (decodedPlan.plan && decodedPlan.plan._id) || null;
+        setCurrentPlanId(sharedPlanId || hashPrompt(decodedPlan.prompt));
         setPlanValidated(false);
         setFiles([]);
         setProgress(50);
@@ -278,6 +299,11 @@ export default function Dashboard() {
       setProgress(100);
       setPlanValidated(true);
       toast.success('Projet généré avec succès !');
+      if (plan && !(plan as any).id) {
+        const generatedId = `plan_${Date.now()}`;
+        (plan as any).id = generatedId;
+        setCurrentPlanId(generatedId);
+      }
     } catch (err) {
       const message = err instanceof Error ? err.message : JSON.stringify(err);
       setError('Erreur lors de la génération du projet : ' + message);
@@ -288,6 +314,7 @@ export default function Dashboard() {
 
   const handleLoadDraft = (draft: any) => {
     setPlan(draft.plan);
+    setCurrentPlanId(draft.id || hashPrompt(draft.prompt)); // <-- stocke l'id du draft
     setPlanValidated(false);
     setFiles(draft.files || []);
     setProgress(50);
@@ -783,14 +810,22 @@ export default function Dashboard() {
         </div>
       )}
       {isChatbotOpen && (
-        <ChatbotPanel
-          selectedFile={selectedFile}
-          fileCode={fileCode}
-          onCodeUpdate={setFileCode}
-          onClose={() => setIsChatbotOpen(false)}
-          chatHistory={chatHistory}
-          setChatHistory={setChatHistory}
-        />
+        <div>
+          <button
+            className="absolute top-4 right-80 z-50 bg-gray-200 hover:bg-red-200 text-gray-700 px-3 py-1 rounded text-xs"
+            onClick={() => setChatHistory([])}
+          >
+            Réinitialiser l'historique du chat
+          </button>
+          <ChatbotPanel
+            selectedFile={selectedFile}
+            fileCode={fileCode}
+            onCodeUpdate={setFileCode}
+            onClose={() => setIsChatbotOpen(false)}
+            chatHistory={chatHistory}
+            setChatHistory={setChatHistory}
+          />
+        </div>
       )}
       {/* Bouton flottant et Chatbot latéral */}
       {!isChatbotOpen && !isPlansPanelOpen && !isQuickActionsOpen && (
@@ -954,4 +989,14 @@ export default function Dashboard() {
       </Dialog>
     </div>
   );
+}
+
+// Ajoute la fonction utilitaire hashPrompt (simple hash du prompt)
+function hashPrompt(prompt: string): string {
+  let hash = 0;
+  for (let i = 0; i < prompt.length; i++) {
+    hash = ((hash << 5) - hash) + prompt.charCodeAt(i);
+    hash |= 0;
+  }
+  return `hash_${Math.abs(hash)}`;
 }
