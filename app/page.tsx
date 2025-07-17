@@ -12,7 +12,8 @@ import {
   CheckCircle,
   TrendingUp,
   Users,
-  Clock
+  Clock,
+  Info
 } from 'lucide-react';
 
 
@@ -53,6 +54,7 @@ export default function Home() {
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [searchLoading, setSearchLoading] = useState(false);
   const [searchError, setSearchError] = useState('');
+  const [showTip, setShowTip] = useState(true);
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -119,6 +121,23 @@ export default function Home() {
             ))}
           </div>
         </div>
+
+        {/* Astuce utilisateur juste au-dessus du PromptForm */}
+        {showTip && (
+          <div className="max-w-2xl mx-auto mb-6 p-4 bg-yellow-50 border-l-4 border-yellow-400 flex items-center gap-3 rounded shadow">
+            <Info className="h-6 w-6 text-yellow-500" />
+            <div className="text-yellow-900 text-base flex-1">
+              <b>Astuce :</b> Pour obtenir un code complet et de qualité pour votre projet, décrivez votre besoin de façon <b>claire et détaillée</b> dans le prompt. Plus votre prompt est précis, plus le résultat sera complet !
+            </div>
+            <button
+              onClick={() => setShowTip(false)}
+              className="ml-4 text-yellow-700 hover:text-red-500 font-bold text-lg px-2 self-center"
+              aria-label="Fermer l'astuce"
+            >
+              ×
+            </button>
+          </div>
+        )}
 
         {/* Form Section */}
         <div className="mb-16">

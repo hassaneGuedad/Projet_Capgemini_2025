@@ -28,7 +28,7 @@ async function createRepo(token: string, name: string, isPrivate: boolean) {
 }
 
 async function pushFile(token: string, owner: string, repo: string, file: ProjectFile) {
-  // On suppose que file.path est le chemin relatif (ex: src/index.ts)
+  // On suppose que file.path est le chemin relatif 
   const content = Buffer.from(file.description || '').toString('base64');
   const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${file.path}`, {
     method: 'PUT',

@@ -224,7 +224,7 @@ export function ChatbotPanel({ selectedFile, fileCode, onCodeUpdate, onClose, ch
       {showTip && (
         <div className="bg-blue-50 border-b border-blue-200 text-blue-800 px-4 py-2 flex items-center justify-between text-sm">
           <span>
-            <b>Astuce :</b> Utilisez <code>/search motclé</code> pour rechercher du code dans votre projet (ex : <code>/search function Navbar()</code>).
+            <b>Astuce :</b> Demandez au chatbot d'expliquer un fichier ou de corriger du code en posant une question comme : <code>Explique moi le code de fichier App.tsx</code> ou <code>Corrige les erreurs dans ce code</code>.
           </span>
           <button onClick={() => setShowTip(false)} className="ml-4 text-blue-600 hover:text-red-500 font-bold text-lg" aria-label="Fermer">×</button>
         </div>
