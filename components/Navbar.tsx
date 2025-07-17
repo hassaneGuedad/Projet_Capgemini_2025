@@ -88,8 +88,8 @@ export const Navbar: React.FC = () => {
               alt="Logo Capgemini"
               className="h-16 w-16 object-contain rounded-full shadow"
             />
-            <span className="text-2xl font-bold" style={{ fontFamily: 'Pacifico, cursive' }}>
-              <span className="text-blue-600">Cap</span><span className="text-yellow-400">Code</span>
+            <span className="text-2xl font-bold" style={{ fontFamily: 'Luckiest Guy, cursive' }}>
+              <span className="text-blue-600">Cap</span><span className="text-yellow-400">WorkSpace</span>
             </span>
           </Link>
 
@@ -111,6 +111,20 @@ export const Navbar: React.FC = () => {
                 <span>Dashboard</span>
               </Link>
             )}
+            <Link 
+              href="/guide" 
+              className="flex items-center space-x-2 text-gray-600 hover:text-blue-600 transition-colors duration-200"
+            >
+              <Code2 className="h-4 w-4" />
+              <span>Guide d’utilisation</span>
+            </Link>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <Link 
+              href="/contact" 
+              className="flex items-center space-x-2 text-gray-600 hover:text-blue-600 transition-colors duration-200"
+            >
+              <User className="h-4 w-4" />
+              <span>Contact</span>
+            </Link>
           </div>
 
           {/* User Actions */}

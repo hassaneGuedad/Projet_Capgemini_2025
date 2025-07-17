@@ -958,8 +958,16 @@ export default function Dashboard() {
                 } catch (e) {
                   data = { error: 'Réponse du serveur non valide.' };
                 }
-                if (res.ok && data.url) {
-                  setNetlifyResult(data.url);
+                console.log('Réponse Netlify:', data);
+                if (res.ok && !data.error) {
+                  // Affiche le lien du site si possible
+                  if (data.site && data.site.admin_url) {
+                    setNetlifyResult(data.site.admin_url);
+                  } else if (data.deploy && data.deploy.admin_url) {
+                    setNetlifyResult(data.deploy.admin_url);
+                  } else {
+                    setNetlifyResult('Déploiement réussi, mais aucun lien fourni.');
+                  }
                 } else {
                   setNetlifyError(data.error || data.message || `Erreur HTTP ${res.status}`);
                 }

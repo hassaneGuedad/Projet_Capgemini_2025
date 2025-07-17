@@ -86,6 +86,7 @@
   "devDependencies": {
     "@types/axios": "^0.9.36",
     "@types/jszip": "^3.4.0",
+    "@types/nodemailer": "^6.4.17",
     "@types/uuid": "^10.0.0"
   }
 }

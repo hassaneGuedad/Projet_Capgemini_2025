@@ -28,12 +28,6 @@ export function QuickActionsPanel({ onClose, onDownload, onPreview, onSettings, 
         <button onClick={onDownload} className="w-full flex items-center gap-2 px-4 py-2 rounded bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold hover:from-green-600 hover:to-green-700">
           <Download className="h-5 w-5" /> Télécharger le code source
         </button>
-        <button onClick={onPreview} className="w-full flex items-center gap-2 px-4 py-2 rounded bg-blue-100 text-blue-700 font-semibold hover:bg-blue-200">
-          <Play className="h-5 w-5" /> Lancer l'aperçu
-        </button>
-        <button onClick={onSettings} className="w-full flex items-center gap-2 px-4 py-2 rounded bg-gray-100 text-gray-700 font-semibold hover:bg-gray-200">
-          <Settings className="h-5 w-5" /> Modifier la configuration
-        </button>
         <button onClick={onShare} className="w-full flex items-center gap-2 px-4 py-2 rounded bg-purple-100 text-purple-700 font-semibold hover:bg-purple-200">
           <Share2 className="h-5 w-5" /> Partager le projet
         </button>

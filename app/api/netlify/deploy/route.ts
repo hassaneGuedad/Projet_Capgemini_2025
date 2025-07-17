@@ -38,6 +38,21 @@ async function deployFiles(token: string, siteId: string, files: ProjectFile[]) 
     },
     body: form as any,
   });
-  if (!res.ok) throw new Error('Erreur déploiement Netlify: ' + (await res.text()));
+  if (!res.ok) {
+    const errorText = await res.text();
+    throw new Error('Erreur déploiement Netlify: ' + errorText);
+  }
   return res.json();
+}
+
+export async function POST(req: Request) {
+  try {
+    const { token, files } = await req.json();
+    const site = await createSite(token);
+    const deploy = await deployFiles(token, site.id, files);
+    return NextResponse.json({ site, deploy }, { status: 200 });
+  } catch (error: any) {
+    console.error('Erreur déploiement Netlify:', error);
+    return NextResponse.json({ error: error.message || String(error) || 'Erreur lors du déploiement.' }, { status: 500 });
+  }
 }
