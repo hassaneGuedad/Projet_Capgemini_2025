@@ -23,7 +23,10 @@ import {
   CheckCircle2,
   Clock,
   Clipboard,
-  Folder
+  Folder,
+  ChevronDown,
+  ChevronUp,
+  Database
 } from 'lucide-react';
 import { getUserPlanDrafts, deletePlanDraft, savePlanDraft } from '@/services/firestore';
 import toast from 'react-hot-toast';
@@ -39,6 +42,8 @@ import { SavedPlansPanel } from '@/components/SavedPlansPanel';
 import { QuickActionsFloatingButton } from '@/components/QuickActionsFloatingButton';
 import { QuickActionsPanel } from '@/components/QuickActionsPanel';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from '@/components/ui/dialog';
+import sdk from '@stackblitz/sdk';
+import { SupabaseFloatingButton } from '@/components/SupabaseFloatingButton';
 
 type GenerationStatus = 'idle' | 'generating' | 'completed';
 
@@ -78,6 +83,7 @@ export default function Dashboard() {
   const [isChatbotOpen, setIsChatbotOpen] = useState(false);
   const [isPlansPanelOpen, setIsPlansPanelOpen] = useState(false);
   const [isQuickActionsOpen, setIsQuickActionsOpen] = useState(false);
+  const [isSupabasePanelOpen, setIsSupabasePanelOpen] = useState(false);
   const [chatHistory, setChatHistory] = useState<{role: 'user' | 'assistant', content: string}[]>([]);
   const [isGitHubModalOpen, setIsGitHubModalOpen] = useState(false);
   const [githubRepoName, setGithubRepoName] = useState('');
@@ -92,6 +98,7 @@ export default function Dashboard() {
   const [netlifyResult, setNetlifyResult] = useState<string|null>(null);
   const [netlifyError, setNetlifyError] = useState<string|null>(null);
   const [currentPlanId, setCurrentPlanId] = useState<string | null>(null);
+  const [showFullPrompt, setShowFullPrompt] = useState(false);
 
   // --- GESTION HISTORIQUE CHAT PAR PROJET ---
   // Utilitaire pour générer une clé unique d'historique (id de plan ou hash du prompt)
@@ -194,11 +201,21 @@ export default function Dashboard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
 
+  // Lors du chargement d'un plan, restaurer le contenu modifié si présent
+  useEffect(() => {
+    if (plan && files.length > 0 && currentPlanId) {
+      setFiles(prevFiles => prevFiles.map(f => {
+        const saved = localStorage.getItem(getFileStorageKey(currentPlanId, f.path));
+        return saved ? { ...f, description: saved } : f;
+      }));
+    }
+    // eslint-disable-next-line
+  }, [plan, currentPlanId]);
+
   // Sauvegarde manuelle
   const handleSave = () => {
-    if (selectedFile) {
-      localStorage.setItem('file_' + selectedFile.path, fileCode);
-      // Met à jour le contenu dans le state files
+    if (selectedFile && currentPlanId) {
+      localStorage.setItem(getFileStorageKey(currentPlanId, selectedFile.path), fileCode);
       setFiles(prev =>
         prev.map(f =>
           f.id === selectedFile.id
@@ -212,11 +229,10 @@ export default function Dashboard() {
 
   // Sauvegarde auto toutes les 5s si code modifié
   useEffect(() => {
-    if (!selectedFile) return;
+    if (!selectedFile || !currentPlanId) return;
     if (saveTimeout.current) clearTimeout(saveTimeout.current);
     saveTimeout.current = setTimeout(() => {
-      localStorage.setItem('file_' + selectedFile.path, fileCode);
-      // Met à jour le contenu dans le state files
+      localStorage.setItem(getFileStorageKey(currentPlanId, selectedFile.path), fileCode);
       setFiles(prev =>
         prev.map(f =>
           f.id === selectedFile.id
@@ -229,7 +245,7 @@ export default function Dashboard() {
     return () => {
       if (saveTimeout.current) clearTimeout(saveTimeout.current);
     };
-  }, [fileCode, selectedFile]);
+  }, [fileCode, selectedFile, currentPlanId]);
 
   const mapToProjectFiles = (generatedFiles: GeneratedFile[]): ProjectFile[] => {
     return generatedFiles.map((file, index) => ({
@@ -322,7 +338,7 @@ export default function Dashboard() {
     setChatHistory(draft.chatHistory || []); // <-- ici
     localStorage.setItem('editedPlan', JSON.stringify(draft.plan));
     localStorage.setItem('currentPrompt', draft.prompt);
-    toast.success('Plan chargé avec succès !');
+    toast.success('Plan chargé avec succès !', { duration: 1000 });
   };
 
   // Fonction pour supprimer un plan brouillon
@@ -376,18 +392,19 @@ export default function Dashboard() {
 
   // Gestion création, suppression, renommage fichiers
   const handleCreateFile = (name: string) => {
-    setFiles(prev => [
-      ...prev,
-      {
-        id: `file-${Date.now()}`,
-        name,
-        path: name,
-        type: 'page',
-        size: '0 B',
-        lastModified: new Date(),
-        description: '',
-      }
-    ]);
+    const newFile: ProjectFile = {
+      id: `file-${Date.now()}`,
+      name,
+      path: name,
+      type: 'page', // <-- le type correspond bien à l'union
+      size: '0 B',
+      lastModified: new Date(),
+      description: '',
+    };
+    if (currentPlanId) {
+      localStorage.setItem(getFileStorageKey(currentPlanId, name), '');
+    }
+    setFiles(prev => [...prev, newFile]);
   };
   const handleCreateFolder = (name: string) => {
     setFiles(prev => [
@@ -579,13 +596,44 @@ export default function Dashboard() {
                 <span>Partager</span>
               </Button>
               {files.length > 0 && (
-                <Button 
-                  onClick={handleExportProject}
-                  className="flex items-center space-x-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"
-                >
-                <Download className="h-4 w-4" />
-                  <span>Télécharger le projet</span>
-              </Button>
+                <>
+                  <Button 
+                    onClick={handleExportProject}
+                    className="flex items-center space-x-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"
+                  >
+                    <Download className="h-4 w-4" />
+                    <span>Télécharger le projet</span>
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      // Préparer les fichiers pour StackBlitz
+                      const stackblitzFiles = files.reduce((acc, f) => {
+                        acc[f.path] = f.description || '';
+                        return acc;
+                      }, {} as Record<string, string>);
+                      // Ajouter un package.json minimal si absent
+                      if (!stackblitzFiles['package.json']) {
+                        stackblitzFiles['package.json'] = JSON.stringify({
+                          name: 'capworkspace-project',
+                          version: '1.0.0',
+                          main: 'index.js',
+                          scripts: { start: 'node index.js' },
+                          dependencies: {}
+                        }, null, 2);
+                      }
+                      sdk.openProject({
+                        files: stackblitzFiles,
+                        title: 'Projet CapWorkSpace',
+                        description: 'Projet généré avec CapWorkSpace',
+                        template: 'node', // ou 'javascript', 'create-react-app', etc. selon le projet
+                      });
+                    }}
+                    className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    <svg viewBox="0 0 32 32" fill="currentColor" className="h-4 w-4"><path d="M16 0l-2.219 2.219 2.219 2.219 2.219-2.219zM2.219 2.219l-2.219 2.219 2.219 2.219 2.219-2.219zM29.781 2.219l-2.219 2.219 2.219 2.219 2.219-2.219zM16 4.438l-11.563 11.563 2.219 2.219 9.344-9.344 9.344 9.344 2.219-2.219zM0 16l2.219 2.219 2.219-2.219-2.219-2.219zM29.781 13.781l-2.219 2.219 2.219 2.219 2.219-2.219zM16 27.563l-2.219 2.219 2.219 2.219 2.219-2.219zM2.219 29.781l-2.219 2.219 2.219 2.219 2.219-2.219zM29.781 29.781l-2.219 2.219 2.219 2.219 2.219-2.219z"/></svg>
+                    <span>Lancer dans StackBlitz</span>
+                  </Button>
+                </>
               )}
             </div>
           </div>
@@ -603,9 +651,23 @@ export default function Dashboard() {
                     </Badge>
                   </div>
                   {currentPrompt && (
-                    <p className="text-sm text-gray-600 max-w-2xl">
-                      <span className="font-medium">Prompt utilisé:</span> {currentPrompt}
-                    </p>
+                    <div className="text-sm text-gray-600 max-w-2xl flex items-start gap-2">
+                      <span className="font-medium">Prompt utilisé:</span>
+                      <span>
+                        {currentPrompt.length > 200 && !showFullPrompt
+                          ? currentPrompt.slice(0, 200) + '...'
+                          : currentPrompt}
+                      </span>
+                      {currentPrompt.length > 200 && (
+                        <button
+                          onClick={() => setShowFullPrompt(v => !v)}
+                          className="ml-2 text-blue-600 hover:text-blue-800 text-xs flex items-center"
+                          aria-label={showFullPrompt ? 'Masquer le prompt' : 'Afficher tout le prompt'}
+                        >
+                          {showFullPrompt ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                        </button>
+                      )}
+                    </div>
                   )}
                 </div>
                 <div className="text-right space-y-2">
@@ -623,7 +685,13 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-7 gap-8">
           {/* Left Column - Plan Overview et éditeur élargi */}
           <div className="lg:col-span-7 space-y-8">
-            {plan && !planValidated && <PlanOverview plan={plan} onAllStepsValidated={handlePlanValidated} />}
+            {plan && !planValidated && (
+              <PlanOverview 
+                plan={plan} 
+                onAllStepsValidated={handlePlanValidated}
+                showValidateButton={!planDrafts.some(d => d.id === currentPlanId)}
+              />
+            )}
             {files.length > 0 && (
               <div className="flex">
                 <div className="w-64 flex-shrink-0">
@@ -639,7 +707,7 @@ export default function Dashboard() {
                 </div>
                 <div className="flex-1 ml-24">
                   {selectedFile && (
-                    <div className="mt-6">
+                    <div className={planDrafts.some(d => d.id === currentPlanId) ? "mt-12" : "mt-6"}>
                       <div className="flex items-center mb-2">
                         <h3 className="font-bold mr-4">{selectedFile.name}</h3>
                         <button
@@ -828,11 +896,56 @@ export default function Dashboard() {
         </div>
       )}
       {/* Bouton flottant et Chatbot latéral */}
-      {!isChatbotOpen && !isPlansPanelOpen && !isQuickActionsOpen && (
+      {!isChatbotOpen && !isPlansPanelOpen && !isQuickActionsOpen && !isSupabasePanelOpen && (
         <ChatbotFloatingButton onClick={() => setIsChatbotOpen(true)} />
       )}
-      {!isPlansPanelOpen && !isChatbotOpen && !isQuickActionsOpen && (
+      {!isPlansPanelOpen && !isChatbotOpen && !isQuickActionsOpen && !isSupabasePanelOpen && (
         <SavedPlansFloatingButton onClick={() => setIsPlansPanelOpen(true)} />
+      )}
+      {!isQuickActionsOpen && !isChatbotOpen && !isPlansPanelOpen && !isSupabasePanelOpen && (
+        <QuickActionsFloatingButton onClick={() => setIsQuickActionsOpen(true)} />
+      )}
+      {/* Ajout du bouton Supabase */}
+      {!isSupabasePanelOpen && !isChatbotOpen && !isPlansPanelOpen && !isQuickActionsOpen && (
+        <SupabaseFloatingButton onClick={() => setIsSupabasePanelOpen(true)} />
+      )}
+      {/* Panneau latéral Supabase */}
+      {isSupabasePanelOpen && (
+        <div className="fixed top-0 right-0 h-full w-full max-w-md bg-white shadow-2xl z-50 flex flex-col animate-slide-in">
+          <div className="flex items-center justify-between p-4 border-b">
+            <div className="flex items-center gap-2">
+              <span className="inline-flex items-center justify-center rounded-full bg-green-100 h-10 w-10">
+                <Database className="h-6 w-6 text-green-600" />
+              </span>
+              <span className="text-lg font-bold text-green-700">Intégration Supabase</span>
+            </div>
+            <button onClick={() => setIsSupabasePanelOpen(false)} className="text-gray-500 hover:text-red-500 text-2xl font-bold">×</button>
+          </div>
+          <div className="p-6 flex-1 overflow-y-auto">
+            <div className="text-gray-700 text-sm mb-4">
+              Pour connecter votre projet à Supabase&nbsp;:
+              <ol className="list-decimal ml-6 mt-2 space-y-1">
+                <li>Cliquez sur <b>Connecter à Supabase</b> pour ouvrir votre espace Supabase et sélectionner un projet existant.</li>
+                <li>Ou cliquez sur <b>Créer un projet Supabase</b> pour en créer un nouveau dans votre organisation.</li>
+                <li>Copiez l’URL et la clé API de votre projet Supabase, puis ajoutez-les dans votre fichier <code>.env</code> ou dans la configuration du projet généré.</li>
+              </ol>
+            </div>
+            <div className="flex gap-4 mt-4">
+              <Button
+                onClick={() => window.open('https://app.supabase.com/', '_blank')}
+                className="bg-green-600 hover:bg-green-700 text-white"
+              >
+                Connecter à Supabase
+              </Button>
+              <Button
+                onClick={() => window.open('https://app.supabase.com/project/new', '_blank')}
+                className="bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                Créer un projet Supabase
+              </Button>
+            </div>
+          </div>
+        </div>
       )}
       {isPlansPanelOpen && (
         <SavedPlansPanel
@@ -841,10 +954,6 @@ export default function Dashboard() {
           onDelete={handleDeleteDraft}
           onClose={() => setIsPlansPanelOpen(false)}
         />
-      )}
-      {/* Quick Actions bouton et panneau latéral */}
-      {!isQuickActionsOpen && !isChatbotOpen && !isPlansPanelOpen && (
-        <QuickActionsFloatingButton onClick={() => setIsQuickActionsOpen(true)} />
       )}
       {isQuickActionsOpen && (
         <QuickActionsPanel
@@ -1007,4 +1116,9 @@ function hashPrompt(prompt: string): string {
     hash |= 0;
   }
   return `hash_${Math.abs(hash)}`;
+}
+
+// Utilitaire pour la clé de stockage par plan et fichier
+function getFileStorageKey(planId: string | null, filePath: string) {
+  return `file_${planId || 'default'}_${filePath}`;
 }

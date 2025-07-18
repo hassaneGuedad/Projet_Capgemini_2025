@@ -76,7 +76,7 @@ const Contact = () => {
       </Card>
       <div className="text-gray-700 text-sm text-center">
         <div className="mb-2">Ou contactez-nous directement :</div>
-        <div>Email : <a href="mailto:SupportCapWorkSpace@gmail.com" className="text-blue-600 underline">supportCapWorkSpace@gmail.com</a></div>
+        <div>Email : <a href="mailto:scapworkspace@gmail.com" className="text-blue-600 underline">supportCapWorkSpace@gmail.com</a></div>
       </div>
     </main>
   );
