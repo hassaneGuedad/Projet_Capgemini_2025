@@ -15,7 +15,7 @@ import {
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Code2, Home, LayoutDashboard, LogOut, User, Loader2 } from 'lucide-react';
+import { Code2, Home, LayoutDashboard, LogOut, User, Loader2, Menu } from 'lucide-react';
 import { createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 
@@ -26,6 +26,7 @@ export const Navbar: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoginMode, setIsLoginMode] = useState(true);
   const [authError, setAuthError] = useState("");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -93,7 +94,16 @@ export const Navbar: React.FC = () => {
             </span>
           </Link>
 
-          {/* Navigation Links */}
+          {/* Hamburger menu (mobile) */}
+          <button
+            className="md:hidden flex items-center justify-center p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            aria-label="Ouvrir le menu"
+            onClick={() => setMobileMenuOpen((v) => !v)}
+          >
+            <Menu className="h-8 w-8 text-blue-600" />
+          </button>
+
+          {/* Navigation Links (desktop) */}
           <div className="hidden md:flex items-center space-x-8">
             <Link 
               href="/" 
@@ -117,7 +127,7 @@ export const Navbar: React.FC = () => {
             >
               <Code2 className="h-4 w-4" />
               <span>Guide d’utilisation</span>
-            </Link>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            </Link>
             <Link 
               href="/contact" 
               className="flex items-center space-x-2 text-gray-600 hover:text-blue-600 transition-colors duration-200"
@@ -242,6 +252,47 @@ export const Navbar: React.FC = () => {
             )}
           </div>
         </div>
+        {/* Mobile menu (dropdown) */}
+        {mobileMenuOpen && (
+          <div className="md:hidden bg-white border-b border-gray-200 w-full animate-fade-in-down">
+            <div className="flex flex-col py-4 space-y-2">
+              <Link 
+                href="/" 
+                className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <Home className="h-4 w-4" />
+                <span>Accueil</span>
+              </Link>
+              {isAuthenticated && (
+                <Link 
+                  href="/dashboard" 
+                  className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <LayoutDashboard className="h-4 w-4" />
+                  <span>Dashboard</span>
+                </Link>
+              )}
+              <Link 
+                href="/guide" 
+                className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <Code2 className="h-4 w-4" />
+                <span>Guide d’utilisation</span>
+              </Link>
+              <Link 
+                href="/contact" 
+                className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <User className="h-4 w-4" />
+                <span>Contact</span>
+              </Link>
+            </div>
+          </div>
+        )}
       </div>
     </nav>
   );

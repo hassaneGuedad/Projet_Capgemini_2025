@@ -25,6 +25,7 @@ export const PromptForm: React.FC<PromptFormProps> = ({ onSubmit }) => {
   const { toast } = useToast();
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = React.useRef<any>(null);
+  const [includeSupabase, setIncludeSupabase] = useState(false);
 
   // Détecter les technologies quand le prompt change
   useEffect(() => {
@@ -95,6 +96,9 @@ export const PromptForm: React.FC<PromptFormProps> = ({ onSubmit }) => {
       if (selectedTechs.length > 0) {
         const techList = selectedTechs.map(tech => `- ${getTechDisplayName(tech)}`).join('\n');
         finalPrompt = `Technologies à utiliser (sélectionnées par l'utilisateur) :\n${techList}\n\n${prompt}`;
+      }
+      if (includeSupabase) {
+        finalPrompt = `INCLURE_SUPABASE\n${finalPrompt}`;
       }
       
       // Simulate API call
@@ -186,6 +190,20 @@ export const PromptForm: React.FC<PromptFormProps> = ({ onSubmit }) => {
             )}
           </div>
           
+          {/* Option Supabase */}
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              id="include-supabase"
+              checked={includeSupabase}
+              onChange={e => setIncludeSupabase(e.target.checked)}
+              className="accent-blue-600 h-4 w-4"
+            />
+            <label htmlFor="include-supabase" className="text-sm text-gray-700 select-none">
+              Inclure <b>Supabase</b> (ajoute la configuration et les dépendances Supabase au projet)
+            </label>
+          </div>
+
           <Button 
             type="submit" 
             className="w-full h-12 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-medium shadow-lg hover:shadow-xl transition-all duration-200"
