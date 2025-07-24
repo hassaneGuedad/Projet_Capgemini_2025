@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Sparkles, Send, Loader2, X, Mic } from 'lucide-react';
+import { Sparkles, Send, Loader2, X, Mic, ChevronDown, Bot, Brain } from 'lucide-react';
 import { detectTechnologies, getTechDisplayName, getTechIcon, type TechId } from '@/lib/tech-detector';
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
@@ -26,6 +26,8 @@ export const PromptForm: React.FC<PromptFormProps> = ({ onSubmit }) => {
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = React.useRef<any>(null);
   const [includeSupabase, setIncludeSupabase] = useState(false);
+  const [selectedModel, setSelectedModel] = useState<'claude-sonnet' | 'deepseek'>('claude-sonnet');
+  const [showModelDropdown, setShowModelDropdown] = useState(false);
 
   // Détecter les technologies quand le prompt change
   useEffect(() => {
@@ -37,6 +39,19 @@ export const PromptForm: React.FC<PromptFormProps> = ({ onSubmit }) => {
       prev.filter((tech: TechId) => techs.includes(tech))
     );
   }, [prompt]);
+
+  // Ferme le dropdown si on clique en dehors
+  useEffect(() => {
+    if (!showModelDropdown) return;
+    const handleClick = (e: MouseEvent) => {
+      const dropdown = document.getElementById('model-select');
+      if (dropdown && !dropdown.contains(e.target as Node)) {
+        setShowModelDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [showModelDropdown]);
 
   const toggleTech = (tech: TechId) => {
     setSelectedTechs(prev => 
@@ -100,17 +115,14 @@ export const PromptForm: React.FC<PromptFormProps> = ({ onSubmit }) => {
       if (includeSupabase) {
         finalPrompt = `INCLURE_SUPABASE\n${finalPrompt}`;
       }
-      
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1500));
-      
       if (onSubmit) {
         onSubmit(finalPrompt);
       }
-      
-      // Store the prompt in localStorage for the dashboard
+      // Store the prompt and model in localStorage for the dashboard
       localStorage.setItem('currentPrompt', finalPrompt);
-      
+      localStorage.setItem('currentModel', selectedModel);
       router.push('/dashboard');
     } catch (error) {
       console.error('Erreur lors de la soumission :', error);
@@ -122,6 +134,23 @@ export const PromptForm: React.FC<PromptFormProps> = ({ onSubmit }) => {
   const handleSuggestedPrompt = (suggestedPrompt: string) => {
     setPrompt(suggestedPrompt);
   };
+
+  const modelOptions = [
+    {
+      value: 'claude-sonnet',
+      label: 'Claude Sonnet',
+      icon: <Bot className="w-5 h-5 text-blue-600" />,
+      description: "Anthropic Claude Sonnet : très bon pour la compréhension, la planification et le code général."
+    },
+    {
+      value: 'deepseek',
+      label: 'Deepseek',
+      icon: <Brain className="w-5 h-5 text-green-600" />,
+      description: "Deepseek : spécialisé dans la génération de code, très performant pour les projets complexes."
+    }
+  ];
+
+  const selectedModelOption = modelOptions.find(opt => opt.value === selectedModel);
 
   return (
     <Card className="w-full max-w-2xl mx-auto shadow-xl border-0 bg-gradient-to-br from-white to-blue-50/30">
@@ -158,6 +187,52 @@ export const PromptForm: React.FC<PromptFormProps> = ({ onSubmit }) => {
               >
                 <Mic className={`h-6 w-6 ${isListening ? 'text-blue-600' : 'text-gray-500'}`} />
               </Button>
+            </div>
+            {/* Sélecteur de modèle IA sous forme de boutons radio stylisés */}
+            <div className="mb-2">
+              <label className="text-sm text-gray-700 font-medium block mb-1">Modèle IA :</label>
+              <div className="flex gap-4">
+                <label className={`flex items-center cursor-pointer px-3 py-2 border rounded-lg shadow-sm transition bg-white hover:bg-blue-50 border-blue-200 font-medium space-x-2 ring-2 ring-transparent focus-within:ring-blue-500 ${selectedModel === 'claude-sonnet' ? 'bg-blue-100 border-blue-500 ring-2 ring-blue-400' : ''}`}>
+                  <input
+                    type="radio"
+                    name="model"
+                    value="claude-sonnet"
+                    checked={selectedModel === 'claude-sonnet'}
+                    onChange={() => setSelectedModel('claude-sonnet')}
+                    className="hidden"
+                  />
+                  <Bot className="w-5 h-5 text-blue-600" />
+                  <span>Claude Sonnet</span>
+                </label>
+                <label className={`flex items-center cursor-pointer px-3 py-2 border rounded-lg shadow-sm transition bg-white hover:bg-green-50 border-green-200 font-medium space-x-2 ring-2 ring-transparent focus-within:ring-green-500 ${selectedModel === 'deepseek' ? 'bg-green-100 border-green-500 ring-2 ring-green-400' : ''}`}>
+                  <input
+                    type="radio"
+                    name="model"
+                    value="deepseek"
+                    checked={selectedModel === 'deepseek'}
+                    onChange={() => setSelectedModel('deepseek')}
+                    className="hidden"
+                  />
+                  <Brain className="w-5 h-5 text-green-600" />
+                  <span>Deepseek</span>
+                </label>
+              </div>
+              <div className="text-xs text-gray-500 mt-1 min-h-[1.5em]">
+                {selectedModel === 'claude-sonnet'
+                  ? "Anthropic Claude Sonnet : très bon pour la compréhension, la planification et le code général."
+                  : "Deepseek : spécialisé dans la génération de code, très performant pour les projets complexes."}
+              </div>
+              <div className="mt-2">
+                {selectedModel === 'claude-sonnet' ? (
+                  <span className="inline-flex items-center px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold">
+                    <Bot className="w-4 h-4 mr-1" /> Modèle sélectionné : Claude Sonnet
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-semibold">
+                    <Brain className="w-4 h-4 mr-1" /> Modèle sélectionné : Deepseek
+                  </span>
+                )}
+              </div>
             </div>
             
             {detectedTechs.length > 0 && (
