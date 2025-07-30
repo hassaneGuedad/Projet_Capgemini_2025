@@ -115,16 +115,19 @@ export const PromptForm: React.FC<PromptFormProps> = ({ onSubmit }) => {
       if (includeSupabase) {
         finalPrompt = `INCLURE_SUPABASE\n${finalPrompt}`;
       }
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Stocker le prompt et le modèle pour le dashboard
+      localStorage.setItem('currentPrompt', finalPrompt);
+      localStorage.setItem('currentModel', selectedModel);
+      
       if (onSubmit) {
         onSubmit(finalPrompt);
       }
-      // Store the prompt and model in localStorage for the dashboard
-      localStorage.setItem('currentPrompt', finalPrompt);
-      localStorage.setItem('currentModel', selectedModel);
+      
+      // Redirection immédiate vers le dashboard
       router.push('/dashboard');
-    } catch (error) {
+    } catch (error: any) {
+      toast({ title: 'Erreur', description: error.message || 'Erreur lors de la préparation du projet.' });
       console.error('Erreur lors de la soumission :', error);
     } finally {
       setIsSubmitting(false);
