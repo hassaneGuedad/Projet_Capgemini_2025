@@ -1,4 +1,4 @@
-# 🚀 Capgemini Smart Project Builder
+# 🚀 Cap WorkSpace
 
 Une plateforme intelligente de génération automatique de projets web alimentée par l'IA, développée par Capgemini .
 
