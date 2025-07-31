@@ -16,7 +16,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Code2, Home, LayoutDashboard, LogOut, User, Loader2, Menu } from 'lucide-react';
-import { createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import { createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, signOut } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 
 export const Navbar: React.FC = () => {
@@ -58,20 +58,79 @@ export const Navbar: React.FC = () => {
   };
 
   const handleGoogleSignIn = async () => {
+    console.log('🔍 === DÉBUT GOOGLE SIGN-IN ===');
+    console.log('🔍 Timestamp:', new Date().toISOString());
+    
     setIsSubmitting(true);
     setAuthError("");
     try {
       if (!auth) {
+        console.log('❌ Firebase Auth non initialisé');
         setAuthError("Firebase Auth n'est pas initialisé.");
         setIsSubmitting(false);
         return;
       }
+      
+      console.log('🔍 Création du provider Google...');
       const provider = new GoogleAuthProvider();
+      console.log('🔍 Tentative de connexion Google...');
+      
       const result = await signInWithPopup(auth, provider);
+      console.log('✅ Connexion Google Firebase réussie');
+      console.log('🔍 Email Google:', result.user.email);
+      
+      // Vérifier si l'email Google est autorisé
+      if (result.user.email) {
+        console.log('🔍 === VÉRIFICATION EMAIL GOOGLE ===');
+        console.log('🔍 Email à vérifier:', result.user.email);
+        
+        console.log('🔍 Appel API /api/auth/check-email...');
+        const checkResponse = await fetch('/api/auth/check-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: result.user.email })
+        });
+
+        console.log('🔍 Status de la réponse:', checkResponse.status);
+        const checkData = await checkResponse.json();
+        console.log('🔍 Données de la réponse:', checkData);
+
+        if (!checkResponse.ok) {
+          console.log('❌ === ERREUR VÉRIFICATION GOOGLE ===');
+          console.log('❌ Erreur API:', checkData.error);
+          // Déconnecter l'utilisateur si erreur de vérification
+          await signOut(auth);
+          setAuthError(checkData.error || 'Erreur lors de la vérification de l\'email');
+          setIsSubmitting(false);
+          return;
+        }
+
+        if (!checkData.isAuthorized) {
+          console.log('❌ === EMAIL GOOGLE NON AUTORISÉ ===');
+          console.log('❌ Email rejeté:', result.user.email);
+          console.log('❌ Déconnexion forcée...');
+          // Déconnecter l'utilisateur si email non autorisé
+          await signOut(auth);
+          setAuthError('❌ Cet email Google n\'est pas autorisé à accéder à la plateforme. Seuls les emails ajoutés par l\'administrateur peuvent se connecter. Veuillez contacter l\'administrateur (scapworkspace@gmail.com).');
+          setIsSubmitting(false);
+          return;
+        }
+        
+        console.log('✅ === EMAIL GOOGLE AUTORISÉ ===');
+        console.log('✅ Email accepté:', result.user.email);
+        console.log('✅ Connexion Google réussie');
+      }
+      
+      console.log('🔍 === FINALISATION ===');
       // On peut ici stocker l'utilisateur dans le contexte si besoin 
       setIsLoginOpen(false);
       setIsLoginMode(true);
+      console.log('✅ === GOOGLE SIGN-IN TERMINÉ AVEC SUCCÈS ===');
     } catch (error: any) {
+      console.error('❌ === ERREUR GOOGLE SIGN-IN ===');
+      console.error('❌ Erreur Firebase:', error);
+      console.error('❌ Code d\'erreur:', error.code);
+      console.error('❌ Message d\'erreur:', error.message);
       setAuthError(error.message || "Erreur Google Sign-In");
     } finally {
       setIsSubmitting(false);

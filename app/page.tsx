@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { PromptForm } from '@/components/PromptForm';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { 
   Sparkles, 
   Zap, 
@@ -13,8 +14,12 @@ import {
   TrendingUp,
   Users,
   Clock,
-  Info
+  Info,
+  Shield,
+  X
 } from 'lucide-react';
+import { AuthorizedEmailsPanel } from '@/components/AuthorizedEmailsPanel';
+import { useAuth } from '@/contexts/AuthContext';
 
 
 export default function Home() {
@@ -56,6 +61,15 @@ export default function Home() {
   const [searchError, setSearchError] = useState('');
   const [showTip, setShowTip] = useState(true);
 
+  // État pour la gestion des emails autorisés
+  const [isAuthorizedEmailsOpen, setIsAuthorizedEmailsOpen] = useState(false);
+  
+  // Contexte d'authentification
+  const { user } = useAuth();
+  
+  // Vérifier si l'utilisateur peut accéder au panel d'administration
+  const canAccessAdminPanel = user?.email === 'scapworkspace@gmail.com';
+
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     setSearchError('');
@@ -84,6 +98,26 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+      {/* Bouton flottant pour la gestion des emails autorisés - Visible uniquement pour l'admin */}
+      {canAccessAdminPanel && (
+        <Button
+          onClick={() => setIsAuthorizedEmailsOpen(true)}
+          className="fixed top-20 right-6 z-50 bg-purple-600 hover:bg-purple-700 text-white shadow-lg"
+          title="Gestion des Emails Autorisés (Admin)"
+        >
+          <Shield className="w-4 h-4 mr-2" />
+          Gérer les Accès
+        </Button>
+      )}
+
+              {/* Panel des Emails Autorisés - Accessible uniquement pour l'admin */}
+        {isAuthorizedEmailsOpen && canAccessAdminPanel && (
+          <AuthorizedEmailsPanel 
+            isOpen={isAuthorizedEmailsOpen}
+            onClose={() => setIsAuthorizedEmailsOpen(false)}
+          />
+        )}
+
       {/* Hero Section */}
       <div className="container mx-auto px-4 py-12">
         <div className="text-center space-y-6 mb-16">
@@ -219,6 +253,60 @@ export default function Home() {
               </p>
             </div>
           </div>
+        </div>
+
+        {/* Section Accès Restreint */}
+        <div className="max-w-4xl mx-auto mt-20">
+          <Card className="border-l-4 border-purple-500 bg-gradient-to-r from-purple-50 to-blue-50">
+            <CardContent className="p-8">
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0">
+                  <div className="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center">
+                    <Shield className="w-6 h-6 text-white" />
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">
+                    Accès Restreint aux Emails Professionnels
+                  </h3>
+                  <p className="text-gray-600 mb-4">
+                    Cette plateforme est réservée aux utilisateurs ayant une adresse email professionnelle autorisée. 
+                    <strong>Seuls les emails préalablement ajoutés par l'administrateur peuvent créer un compte.</strong> 
+                    Si votre email n'est pas autorisé, contactez l'administrateur pour demander l'accès.
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    <Badge variant="outline" className="bg-purple-100 text-purple-700 border-purple-300">
+                      <Shield className="w-3 h-3 mr-1" />
+                      Sécurité Renforcée
+                    </Badge>
+                    <Badge variant="outline" className="bg-blue-100 text-blue-700 border-blue-300">
+                      <Users className="w-3 h-3 mr-1" />
+                      Accès Contrôlé
+                    </Badge>
+                    <Badge variant="outline" className="bg-green-100 text-green-700 border-green-300">
+                      <CheckCircle className="w-3 h-3 mr-1" />
+                      Emails Vérifiés
+                    </Badge>
+                  </div>
+                </div>
+                {canAccessAdminPanel ? (
+                  <Button
+                    onClick={() => setIsAuthorizedEmailsOpen(true)}
+                    variant="outline"
+                    className="border-purple-300 text-purple-700 hover:bg-purple-50"
+                  >
+                    <Shield className="w-4 h-4 mr-2" />
+                    Gérer les Accès
+                  </Button>
+                ) : (
+                  <Badge variant="outline" className="bg-gray-100 text-gray-600 border-gray-300">
+                    <Shield className="w-3 h-3 mr-1" />
+                    Accès Administrateur Requis
+                  </Badge>
+                )}
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>

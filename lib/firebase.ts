@@ -19,22 +19,26 @@ let auth: Auth | undefined;
 let db: Firestore | undefined;
 let firebaseInitialized = false;
 
-if (typeof window !== 'undefined') {
   try {
     app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
     auth = getAuth(app);
     
-    // Initialisation de Firestore avec la persistance
+  // Initialisation de Firestore avec la persistance côté client uniquement
+  if (typeof window !== 'undefined') {
     db = initializeFirestore(app, {
       localCache: persistentLocalCache({
         // Options de cache si nécessaire
       })
     });
+  } else {
+    // Côté serveur, utiliser Firestore sans persistance
+    db = getFirestore(app);
+  }
     
     firebaseInitialized = true;
+  console.log('✅ Firebase initialisé avec succès');
   } catch (error) {
-    console.error('Erreur lors de l\'initialisation de Firebase:', error);
-  }
+  console.error('❌ Erreur lors de l\'initialisation de Firebase:', error);
 }
 
 export { app, auth, db, firebaseInitialized };

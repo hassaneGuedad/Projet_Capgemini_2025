@@ -1,0 +1,157 @@
+@startuml "Diagramme de Cas d'Utilisation Simplifié - Projet Capgemini NextJS"
+
+!define RECTANGLE class
+
+' Configuration du diagramme
+skinparam actorStyle awesome
+skinparam usecase {
+    BackgroundColor LightBlue
+    BorderColor DarkBlue
+    ArrowColor DarkBlue
+}
+
+' Acteurs principaux uniquement
+actor "Utilisateur" as USER #LightBlue
+actor "Administrateur" as ADMIN #Orange
+
+' Système principal
+rectangle "Système Capgemini Workspace" as SYSTEM {
+    ' Interface Utilisateur
+    package "Interface Utilisateur" {
+        usecase "Accéder à la\nPage d'Accueil" as UC1
+        usecase "Consulter le\nGuide d'Utilisation" as UC2
+        usecase "Contacter le\nSupport" as UC3
+        usecase "Accéder au\nDashboard" as UC4
+    }
+    
+    ' Fonctionnalités principales
+    package "Fonctionnalités Principales" {
+        usecase "Créer un Prompt\nde Projet" as UC5
+        usecase "Générer un\nProjet Complet" as UC6
+        usecase "Éditer du Code\nen Temps Réel" as UC7
+        usecase "Générer des\nDiagrammes UML" as UC8
+        usecase "Interagir avec\nle Chatbot IA" as UC9
+        usecase "Exporter un\nProjet (ZIP)" as UC10
+        usecase "Déployer un\nProjet" as UC11
+        usecase "Sauvegarder des\nPlans" as UC12
+        usecase "Consulter\nl'Historique" as UC13
+        usecase "Rechercher dans\nle Code" as UC14
+        usecase "Modifier des\nFichiers" as UC15
+        usecase "S'inscrire/\nSe connecter" as UC16
+    }
+    
+    ' Fonctionnalités administratives
+    package "Fonctionnalités Administratives" {
+        usecase "Gérer les Emails\nAutorisés" as UC17
+        usecase "Consulter les\nStatistiques" as UC18
+        usecase "Configurer le\nSystème" as UC19
+        usecase "Ajouter des\nUtilisateurs" as UC20
+        usecase "Supprimer des\nUtilisateurs" as UC21
+        usecase "Voir la Liste\ndes Utilisateurs" as UC22
+    }
+}
+
+' Relations Utilisateur
+USER --> UC1
+USER --> UC2
+USER --> UC3
+USER --> UC4
+USER --> UC5
+USER --> UC6
+USER --> UC7
+USER --> UC8
+USER --> UC9
+USER --> UC10
+USER --> UC11
+USER --> UC12
+USER --> UC13
+USER --> UC14
+USER --> UC15
+USER --> UC16
+
+' Relations Administrateur
+ADMIN --> UC17
+ADMIN --> UC18
+ADMIN --> UC19
+ADMIN --> UC20
+ADMIN --> UC21
+ADMIN --> UC22
+
+' L'administrateur peut aussi faire tout ce que fait l'utilisateur
+ADMIN --> UC1
+ADMIN --> UC2
+ADMIN --> UC3
+ADMIN --> UC4
+ADMIN --> UC5
+ADMIN --> UC6
+ADMIN --> UC7
+ADMIN --> UC8
+ADMIN --> UC9
+ADMIN --> UC10
+ADMIN --> UC11
+ADMIN --> UC12
+ADMIN --> UC13
+ADMIN --> UC14
+ADMIN --> UC15
+
+' Relations d'inclusion et d'extension
+UC6 ..> UC7 : <<include>>
+UC6 ..> UC8 : <<include>>
+UC9 ..> UC14 : <<extend>>
+UC11 ..> UC10 : <<extend>>
+UC17 ..> UC20 : <<include>>
+UC17 ..> UC21 : <<include>>
+UC17 ..> UC22 : <<include>>
+
+' Notes explicatives
+note right of UC6
+  Le système IA analyse le prompt
+  et génère automatiquement :
+  - Structure du projet
+  - Code source
+  - Configuration
+  - Documentation
+end note
+
+note right of UC9
+  Le chatbot IA peut :
+  - Expliquer le code
+  - Modifier des fichiers
+  - Répondre aux questions
+  - Suggérer des améliorations
+end note
+
+note right of UC17
+  L'administrateur peut :
+  - Ajouter des emails autorisés
+  - Supprimer des accès
+  - Gérer les permissions
+  - Voir la liste des utilisateurs
+end note
+
+note right of UC8
+  Génération automatique de :
+  - Diagrammes de classes
+  - Diagrammes de composants
+  - Diagrammes de séquence
+  - Diagrammes d'activité
+  - Diagrammes entité-relation
+end note
+
+note right of USER
+  L'utilisateur peut :
+  - Créer et gérer des projets
+  - Utiliser toutes les fonctionnalités
+  - Interagir avec l'IA
+  - Exporter et déployer
+end note
+
+note right of ADMIN
+  L'administrateur peut :
+  - Tout ce que fait l'utilisateur
+  - Gérer les accès utilisateurs
+  - Consulter les statistiques
+  - Configurer le système
+end note
+
+@enduml 

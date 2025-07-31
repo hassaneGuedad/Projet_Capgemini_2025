@@ -26,7 +26,8 @@ import {
   Folder,
   ChevronDown,
   ChevronUp,
-  Database
+  Database,
+  BarChart3
 } from 'lucide-react';
 import { getUserPlanDrafts, deletePlanDraft, savePlanDraft } from '@/services/firestore';
 import toast from 'react-hot-toast';
@@ -44,6 +45,12 @@ import { QuickActionsPanel } from '@/components/QuickActionsPanel';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from '@/components/ui/dialog';
 import sdk from '@stackblitz/sdk';
 import { SupabaseFloatingButton } from '@/components/SupabaseFloatingButton';
+import { UMLFloatingButton } from '@/components/UMLFloatingButton';
+import { UMLPanel } from '@/components/UMLPanel';
+import { AuthorizedEmailsFloatingButton } from '@/components/AuthorizedEmailsFloatingButton';
+import { AuthorizedEmailsPanel } from '@/components/AuthorizedEmailsPanel';
+
+
 
 type GenerationStatus = 'idle' | 'generating' | 'completed';
 
@@ -84,6 +91,13 @@ export default function Dashboard() {
   const [isPlansPanelOpen, setIsPlansPanelOpen] = useState(false);
   const [isQuickActionsOpen, setIsQuickActionsOpen] = useState(false);
   const [isSupabasePanelOpen, setIsSupabasePanelOpen] = useState(false);
+  const [isUMLPanelOpen, setIsUMLPanelOpen] = useState(false);
+  const [isAuthorizedEmailsPanelOpen, setIsAuthorizedEmailsPanelOpen] = useState(false);
+  
+  // Vérifier si l'utilisateur peut accéder au panel d'administration
+  const canAccessAdminPanel = user?.email === 'scapworkspace@gmail.com';
+
+
   const [chatHistory, setChatHistory] = useState<{role: 'user' | 'assistant', content: string}[]>([]);
   const [isGitHubModalOpen, setIsGitHubModalOpen] = useState(false);
   const [githubRepoName, setGithubRepoName] = useState('');
@@ -950,8 +964,16 @@ export default function Dashboard() {
         <QuickActionsFloatingButton onClick={() => setIsQuickActionsOpen(true)} />
       )}
       {/* Ajout du bouton Supabase */}
-      {!isSupabasePanelOpen && !isChatbotOpen && !isPlansPanelOpen && !isQuickActionsOpen && (
+      {!isSupabasePanelOpen && !isChatbotOpen && !isPlansPanelOpen && !isQuickActionsOpen && !isUMLPanelOpen && (
         <SupabaseFloatingButton onClick={() => setIsSupabasePanelOpen(true)} />
+      )}
+      {/* Ajout du bouton UML */}
+      {!isUMLPanelOpen && !isChatbotOpen && !isPlansPanelOpen && !isQuickActionsOpen && !isSupabasePanelOpen && !isAuthorizedEmailsPanelOpen && (
+        <UMLFloatingButton onClick={() => setIsUMLPanelOpen(true)} />
+      )}
+      {/* Ajout du bouton Emails Autorisés - Visible uniquement pour l'admin */}
+      {canAccessAdminPanel && !isUMLPanelOpen && !isChatbotOpen && !isPlansPanelOpen && !isQuickActionsOpen && !isSupabasePanelOpen && !isAuthorizedEmailsPanelOpen && (
+        <AuthorizedEmailsFloatingButton onClick={() => setIsAuthorizedEmailsPanelOpen(true)} />
       )}
       {/* Panneau latéral Supabase */}
       {isSupabasePanelOpen && (
@@ -1015,6 +1037,32 @@ export default function Dashboard() {
           }}
         />
       )}
+      {/* Panneau latéral UML */}
+      {isUMLPanelOpen && (
+        <div className="fixed top-0 right-0 h-full w-full max-w-md bg-white shadow-2xl z-50 flex flex-col animate-slide-in">
+          <div className="flex items-center justify-between p-4 border-b">
+            <div className="flex items-center gap-2">
+              <span className="inline-flex items-center justify-center rounded-full bg-purple-100 h-10 w-10">
+                <BarChart3 className="h-6 w-6 text-purple-600" />
+              </span>
+              <span className="text-lg font-bold text-purple-700">Générateur UML</span>
+            </div>
+            <button onClick={() => setIsUMLPanelOpen(false)} className="text-gray-500 hover:text-red-500 text-2xl font-bold">×</button>
+          </div>
+          <div className="p-6 flex-1 overflow-y-auto">
+            <UMLPanel files={files} />
+          </div>
+        </div>
+      )}
+      {/* Panel des Emails Autorisés - Accessible uniquement pour l'admin */}
+      {isAuthorizedEmailsPanelOpen && canAccessAdminPanel && (
+        <AuthorizedEmailsPanel 
+          isOpen={isAuthorizedEmailsPanelOpen}
+          onClose={() => setIsAuthorizedEmailsPanelOpen(false)}
+        />
+      )}
+
+
       <Dialog open={isGitHubModalOpen} onOpenChange={setIsGitHubModalOpen}>
         <DialogContent>
           <DialogHeader>
