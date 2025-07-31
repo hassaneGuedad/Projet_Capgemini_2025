@@ -1,0 +1,44 @@
+@startuml "Diagramme de Séquence - Authentification"
+
+!define RECTANGLE class
+
+' Configuration du diagramme
+skinparam sequence {
+    BackgroundColor LightBlue
+    BorderColor DarkBlue
+    ArrowColor DarkBlue
+}
+
+actor "Utilisateur" as User
+participant "Frontend\n(Next.js)" as Frontend
+participant "Firebase Auth" as Firebase
+participant "Service\nAuthorized Emails" as AuthService
+
+== Connexion ==
+
+User -> Frontend: Cliquer sur "Se connecter"
+Frontend -> User: Afficher popup Google Auth
+User -> Frontend: Sélectionner compte Google
+Frontend -> Firebase: Demander authentification
+Firebase -> User: Rediriger vers Google OAuth
+User -> Firebase: Autoriser l'accès
+Firebase -> Frontend: Retourner token d'auth
+
+Frontend -> AuthService: Vérifier email autorisé
+
+alt Email autorisé
+    AuthService -> Frontend: Accès autorisé
+    Frontend -> User: Rediriger vers dashboard
+else Email non autorisé
+    AuthService -> Frontend: Accès refusé
+    Frontend -> User: Afficher message d'erreur
+end
+
+== Déconnexion ==
+
+User -> Frontend: Cliquer sur "Se déconnecter"
+Frontend -> Firebase: Signaler déconnexion
+Firebase -> Frontend: Confirmer déconnexion
+Frontend -> User: Rediriger vers accueil
+
+@enduml 

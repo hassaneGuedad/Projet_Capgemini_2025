@@ -1,0 +1,274 @@
+@startuml "Diagramme de Classes - Projet Capgemini NextJS"
+
+!define RECTANGLE class
+
+' Configuration du diagramme
+skinparam class {
+    BackgroundColor LightBlue
+    BorderColor DarkBlue
+    ArrowColor DarkBlue
+}
+
+' Classes principales du système
+package "Interface Utilisateur" {
+    class Dashboard {
+        +currentPrompt: string
+        +generationStatus: GenerationStatus
+        +plan: Plan
+        +files: ProjectFile[]
+        +error: string
+        +planValidated: boolean
+        +planDrafts: PlanDraft[]
+        +selectedFile: ProjectFile
+        +openTabs: string[]
+        +generateProject()
+        +savePlanDraft()
+        +loadPlanDraft()
+        +exportProject()
+        +deployProject()
+    }
+
+    class PromptForm {
+        +prompt: string
+        +detectedTechnologies: string[]
+        +isGenerating: boolean
+        +handleSubmit()
+        +handleVoiceInput()
+        +detectTechnologies()
+    }
+
+    class CodeEditor {
+        +code: string
+        +language: string
+        +theme: string
+        +onChange()
+        +onSave()
+        +formatCode()
+    }
+
+    class UMLPanel {
+        +files: ProjectFile[]
+        +selectedDiagram: string
+        +result: UMLResult
+        +loading: boolean
+        +generateDiagram()
+        +downloadDiagram()
+        +copyToClipboard()
+    }
+
+    class ChatbotPanel {
+        +messages: Message[]
+        +input: string
+        +isLoading: boolean
+        +sendMessage()
+        +handleCommand()
+        +searchCode()
+        +explainFile()
+    }
+}
+
+package "Services Backend" {
+    class AuthService {
+        +user: User
+        +isAuthenticated: boolean
+        +isLoading: boolean
+        +signIn()
+        +signOut()
+        +checkAuth()
+        +isEmailAuthorized()
+    }
+
+    class LLMService {
+        +providers: LLMProvider[]
+        +currentProvider: string
+        +callDeepSeek()
+        +callClaude()
+        +generateCode()
+        +analyzePrompt()
+    }
+
+    class UMLGenerator {
+        +classes: UMLClass[]
+        +relationships: UMLRelationship[]
+        +components: string[]
+        +functions: string[]
+        +analyzeCode()
+        +generateClassDiagram()
+        +generateComponentDiagram()
+        +generateSequenceDiagram()
+        +generateActivityDiagram()
+        +generateERDiagram()
+    }
+
+    class FirestoreService {
+        +db: Firestore
+        +saveProject()
+        +getUserProjects()
+        +savePlanDraft()
+        +getUserPlanDrafts()
+        +deletePlanDraft()
+    }
+}
+
+package "Agents IA" {
+    class PromptAgent {
+        +prompt: string
+        +detectedTechs: string[]
+        +generatePlan()
+        +detectTechnologies()
+        +validatePlan()
+    }
+
+    class PlannerAgent {
+        +plan: Plan
+        +filesPlan: FilePlan[]
+        +createFilePlan()
+        +structureProject()
+        +validateArchitecture()
+    }
+
+    class CodeAgent {
+        +filePlan: FilePlan
+        +generatedFile: GeneratedFile
+        +generateCode()
+        +validateCode()
+        +optimizeCode()
+    }
+
+    class ValidatorAgent {
+        +file: GeneratedFile
+        +isValid: boolean
+        +validateFile()
+        +checkSyntax()
+        +verifyStructure()
+    }
+
+    class DeployAgent {
+        +project: Project
+        +deploymentConfig: DeploymentConfig
+        +deployToGitHub()
+        +deployToNetlify()
+        +createRepository()
+        +pushCode()
+    }
+}
+
+package "Types et Interfaces" {
+    interface Plan {
+        +stack: string[]
+        +features: string[]
+        +architecture: string
+        +steps: string[]
+        +files: FilePlan[]
+        +commands: string[]
+        +dependencies: object
+        +devDependencies: object
+    }
+
+    interface FilePlan {
+        +path: string
+        +description: string
+    }
+
+    interface GeneratedFile {
+        +path: string
+        +content: string
+    }
+
+    interface ProjectFile {
+        +name: string
+        +content: string
+        +language: string
+        +size: number
+    }
+
+    interface UMLClass {
+        +name: string
+        +properties: UMLProperty[]
+        +methods: UMLMethod[]
+        +extends: string
+        +implements: string[]
+        +isInterface: boolean
+        +isAbstract: boolean
+    }
+
+    interface UMLRelationship {
+        +from: string
+        +to: string
+        +type: RelationshipType
+        +label: string
+    }
+
+    enum GenerationStatus {
+        IDLE
+        GENERATING
+        COMPLETED
+        ERROR
+    }
+
+    enum RelationshipType {
+        INHERITANCE
+        ASSOCIATION
+        COMPOSITION
+        AGGREGATION
+        DEPENDENCY
+    }
+}
+
+' Relations entre classes
+Dashboard --> PromptForm : uses
+Dashboard --> CodeEditor : contains
+Dashboard --> UMLPanel : contains
+Dashboard --> ChatbotPanel : contains
+
+Dashboard --> AuthService : uses
+Dashboard --> FirestoreService : uses
+Dashboard --> LLMService : uses
+
+PromptForm --> PromptAgent : triggers
+PromptAgent --> PlannerAgent : creates
+PlannerAgent --> CodeAgent : generates
+CodeAgent --> ValidatorAgent : validates
+
+UMLPanel --> UMLGenerator : uses
+ChatbotPanel --> LLMService : uses
+
+DeployAgent --> FirestoreService : reads
+DeployAgent --> LLMService : uses
+
+' Implémentation des interfaces
+PromptAgent ..|> Plan : creates
+PlannerAgent ..|> FilePlan : creates
+CodeAgent ..|> GeneratedFile : creates
+UMLGenerator ..|> UMLClass : creates
+UMLGenerator ..|> UMLRelationship : creates
+
+Dashboard --> GenerationStatus : uses
+UMLRelationship --> RelationshipType : uses
+
+' Notes explicatives
+note right of Dashboard
+  Interface principale qui orchestre
+  toutes les fonctionnalités du système
+  et gère l'état global de l'application
+end note
+
+note right of PromptAgent
+  Agent responsable de l'analyse
+  des prompts utilisateur et de la
+  génération de plans structurés
+end note
+
+note right of UMLGenerator
+  Service d'analyse de code qui
+  génère automatiquement des
+  diagrammes UML en format Mermaid
+end note
+
+note right of LLMService
+  Service centralisé pour l'interaction
+  avec les différents modèles de
+  langage (DeepSeek, Claude, etc.)
+end note
+
+@enduml 

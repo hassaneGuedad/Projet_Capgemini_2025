@@ -1,0 +1,131 @@
+@startuml "Diagramme de Séquence - Génération de Projet"
+
+!define RECTANGLE class
+
+' Configuration du diagramme
+skinparam sequence {
+    BackgroundColor LightBlue
+    BorderColor DarkBlue
+    ArrowColor DarkBlue
+}
+
+actor "Utilisateur" as User
+participant "Dashboard" as Dashboard
+participant "PromptForm" as PromptForm
+participant "PromptAgent" as PromptAgent
+participant "PlannerAgent" as PlannerAgent
+participant "CodeAgent" as CodeAgent
+participant "ValidatorAgent" as ValidatorAgent
+participant "LLMService" as LLMService
+participant "FirestoreService" as Firestore
+participant "UMLGenerator" as UMLGen
+participant "CodeEditor" as Editor
+
+== Génération de Projet ==
+
+User -> Dashboard: Accéder au dashboard
+activate Dashboard
+
+User -> PromptForm: Créer un prompt de projet
+activate PromptForm
+
+PromptForm -> PromptForm: Détecter les technologies
+PromptForm -> User: Afficher les technologies détectées
+
+User -> PromptForm: Confirmer et soumettre
+PromptForm -> Dashboard: Envoyer le prompt
+deactivate PromptForm
+
+Dashboard -> Dashboard: Mettre à jour le statut (GENERATING)
+
+Dashboard -> PromptAgent: Analyser le prompt
+activate PromptAgent
+
+PromptAgent -> LLMService: Appeler DeepSeek/Claude
+activate LLMService
+LLMService -> PromptAgent: Retourner l'analyse
+deactivate LLMService
+
+PromptAgent -> PromptAgent: Structurer le plan
+PromptAgent -> Dashboard: Retourner le plan structuré
+deactivate PromptAgent
+
+Dashboard -> Dashboard: Afficher le plan de projet
+
+User -> Dashboard: Valider le plan
+Dashboard -> Dashboard: Marquer le plan comme validé
+
+Dashboard -> PlannerAgent: Créer le plan de fichiers
+activate PlannerAgent
+
+PlannerAgent -> PlannerAgent: Analyser l'architecture
+PlannerAgent -> Dashboard: Retourner la liste des fichiers à créer
+deactivate PlannerAgent
+
+loop Pour chaque fichier à créer
+    Dashboard -> CodeAgent: Générer le code du fichier
+    activate CodeAgent
+    
+    CodeAgent -> LLMService: Demander la génération de code
+    activate LLMService
+    LLMService -> CodeAgent: Retourner le code généré
+    deactivate LLMService
+    
+    CodeAgent -> ValidatorAgent: Valider le code généré
+    activate ValidatorAgent
+    ValidatorAgent -> ValidatorAgent: Vérifier la syntaxe et la structure
+    ValidatorAgent -> CodeAgent: Confirmer la validité
+    deactivate ValidatorAgent
+    
+    CodeAgent -> Dashboard: Retourner le fichier validé
+    deactivate CodeAgent
+    
+    Dashboard -> Dashboard: Ajouter le fichier à la liste
+end
+
+Dashboard -> Dashboard: Mettre à jour le statut (COMPLETED)
+Dashboard -> User: Afficher les fichiers générés
+
+== Édition et UML ==
+
+User -> Editor: Ouvrir un fichier pour édition
+activate Editor
+Editor -> Dashboard: Charger le contenu du fichier
+Dashboard -> Editor: Retourner le contenu
+Editor -> User: Afficher l'éditeur avec le code
+
+User -> Editor: Modifier le code
+Editor -> Dashboard: Sauvegarder les modifications
+Dashboard -> Firestore: Persister les changements
+activate Firestore
+Firestore -> Dashboard: Confirmer la sauvegarde
+deactivate Firestore
+deactivate Editor
+
+User -> UMLGen: Demander la génération UML
+activate UMLGen
+
+UMLGen -> Dashboard: Récupérer tous les fichiers
+Dashboard -> UMLGen: Retourner la liste des fichiers
+
+UMLGen -> UMLGen: Analyser le code de tous les fichiers
+UMLGen -> UMLGen: Extraire les classes, méthodes, relations
+
+UMLGen -> User: Retourner les diagrammes UML générés
+deactivate UMLGen
+
+== Sauvegarde et Export ==
+
+User -> Dashboard: Sauvegarder le projet
+Dashboard -> Firestore: Sauvegarder le projet complet
+activate Firestore
+Firestore -> Dashboard: Confirmer la sauvegarde
+deactivate Firestore
+
+User -> Dashboard: Exporter le projet
+Dashboard -> Dashboard: Créer l'archive ZIP
+Dashboard -> User: Télécharger le fichier ZIP
+
+deactivate Dashboard
+
+@enduml 

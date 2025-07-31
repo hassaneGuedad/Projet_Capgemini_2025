@@ -1,0 +1,137 @@
+@startuml "Diagramme d'Activité - Projet Capgemini NextJS"
+
+!define RECTANGLE class
+
+' Configuration du diagramme
+skinparam activity {
+    BackgroundColor LightBlue
+    BorderColor DarkBlue
+    ArrowColor DarkBlue
+}
+
+start
+
+:Utilisateur accède à la plateforme;
+
+if (Utilisateur authentifié ?) then (non)
+    :Afficher la page d'accueil;
+    :Présenter les fonctionnalités;
+    :Afficher le formulaire de prompt;
+    
+    :Utilisateur décrit son projet;
+    
+    if (Tentative d'accès au dashboard ?) then (oui)
+        :Rediriger vers l'authentification;
+        :Demander la connexion Google;
+        
+        if (Email autorisé ?) then (non)
+            :Afficher message d'erreur;
+            :Demander de contacter l'admin;
+            stop
+        else (oui)
+            :Authentification réussie;
+        endif
+    else (non)
+        :Continuer en mode consultation;
+        stop
+    endif
+else (oui)
+    :Accéder directement au dashboard;
+endif
+
+:Utilisateur dans le dashboard;
+
+partition "Génération de Projet" {
+    :Créer un prompt de projet;
+    :Détecter automatiquement les technologies;
+    :Afficher les technologies détectées;
+    
+    if (Technologies correctes ?) then (non)
+        :Modifier la sélection;
+    endif
+    
+    :Soumettre le prompt;
+    :PromptAgent analyse la demande;
+    :Générer un plan structuré;
+    :Afficher le plan de projet;
+    
+    if (Plan validé ?) then (non)
+        :Modifier le prompt;
+        :Régénérer le plan;
+    endif
+    
+    :PlannerAgent crée l'architecture;
+    :Définir la structure des fichiers;
+    
+    repeat
+        :CodeAgent génère un fichier;
+        :ValidatorAgent valide le code;
+        if (Code valide ?) then (non)
+            :Régénérer le fichier;
+        endif
+        :Ajouter le fichier au projet;
+    repeat while (Tous les fichiers créés ?) is (non)
+    
+    :Projet généré avec succès;
+}
+
+partition "Édition et Amélioration" {
+    :Afficher la liste des fichiers;
+    :Ouvrir l'éditeur de code;
+    
+    repeat
+        :Sélectionner un fichier;
+        :Éditer le code;
+        :Sauvegarder automatiquement;
+        :Prévisualiser les changements;
+    repeat while (Édition terminée ?) is (non)
+}
+
+partition "Analyse et Documentation" {
+    :Générer des diagrammes UML;
+    :Analyser la structure du code;
+    :Créer la documentation;
+    :Afficher les statistiques du projet;
+}
+
+partition "Assistance IA" {
+    :Ouvrir le chatbot IA;
+    
+    repeat
+        :Poser une question;
+        :IA analyse la demande;
+        :IA génère une réponse;
+        :Afficher l'explication;
+        
+        if (Modification demandée ?) then (oui)
+            :IA modifie le code;
+            :Appliquer les changements;
+        endif
+    repeat while (Assistance terminée ?) is (non)
+}
+
+partition "Sauvegarde et Export" {
+    :Sauvegarder le projet;
+    :Stocker dans Firestore;
+    
+    if (Export demandé ?) then (oui)
+        :Créer l'archive ZIP;
+        :Télécharger le projet;
+    endif
+}
+
+partition "Déploiement (Optionnel)" {
+    if (Déploiement demandé ?) then (oui)
+        :Créer un repository GitHub;
+        :Pousser le code;
+        :Configurer Netlify;
+        :Déployer l'application;
+        :Obtenir l'URL de production;
+    endif
+}
+
+:Projet finalisé;
+
+stop
+
+@enduml 
