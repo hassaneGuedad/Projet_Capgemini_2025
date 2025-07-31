@@ -122,6 +122,8 @@ export default function Dashboard() {
       router.push('/');
       return;
     }
+    
+    // Chargement normal d'un prompt existant
     const prompt = localStorage.getItem('currentPrompt');
     if (prompt) {
       setCurrentPrompt(prompt);
@@ -283,14 +285,20 @@ export default function Dashboard() {
     setGenerationStatus(STATUS.GENERATING);
     setProgress(70);
     try {
-      // Utilisation de la route API Next.js pour interroger DeepSeek côté serveur
+      // Récupérer le modèle choisi par l'utilisateur
+      const selectedModel = localStorage.getItem('currentModel') || 'deepseek';
+      
+      // Utilisation de la route API Next.js pour interroger le modèle choisi
       const response = await fetch('/api/deepseek', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: currentPrompt }),
+        body: JSON.stringify({ 
+          prompt: currentPrompt,
+          model: selectedModel 
+        }),
       });
       const data = await response.json();
-      console.log('Réponse DeepSeek brute:', data);
+      console.log('Réponse API brute:', data);
       const generated = data.content?.[0]?.text || '';
       // Découper la réponse DeepSeek en plusieurs fichiers, toutes extensions
       const fileBlocks = generated.split(/===\s*([^\s=]+?\.[a-zA-Z0-9]+)\s*===/g).filter(Boolean);
@@ -530,12 +538,22 @@ export default function Dashboard() {
       return fileCode;
     }
     if (isReactFile) {
-      // Sanitize code: remove import/export
-      const sanitizedCode = fileCode
+      let sanitizedCode = fileCode
         .replace(/^export default /gm, '')
         .replace(/^import .*/gm, '')
         .replace(/^export .*/gm, '');
-      // Ajout d'un wrapper pour capturer les erreurs
+
+      // Ajoute les définitions globales React/hooks si manquantes
+      const reactGlobals = `
+    const React = window.React;
+    const useState = React.useState;
+    const useEffect = React.useEffect;
+    const useContext = React.useContext;
+    const useRef = React.useRef;
+  `;
+
+      sanitizedCode = reactGlobals + '\n' + sanitizedCode;
+
       return `<!DOCTYPE html>
 <html lang="en">
   <head>
@@ -551,15 +569,41 @@ export default function Dashboard() {
     <script type="text/babel">
       try {
         ${sanitizedCode}
-        let rootComponent = typeof App !== 'undefined' ? <App /> : (typeof exports !== 'undefined' && exports.default ? exports.default : null);
-        if (rootComponent) {
-          const root = ReactDOM.createRoot(document.getElementById('root'));
-          root.render(rootComponent);
-        } else {
-          document.getElementById('preview-error').textContent = 'Aucun composant App trouvé.';
+        
+        // Vérifier si le composant App existe
+        if (typeof App === 'undefined') {
+          document.getElementById('preview-error').textContent = 'Aucun composant App trouvé dans ce fichier. Ce fichier contient probablement un composant secondaire ou utilitaire.';
+          return;
         }
+        
+        // Vérifier si tous les composants utilisés dans App sont définis
+        const appCode = App.toString();
+        const componentMatches = appCode.match(/<([A-Z][a-zA-Z0-9]*)/g);
+        
+        if (componentMatches) {
+          const usedComponents = [...new Set(componentMatches.map(match => match.slice(1)))];
+          const missingComponents = usedComponents.filter(comp => {
+            if (comp === 'App') return false;
+            if (typeof window[comp] !== 'undefined') return false;
+            if (sanitizedCode.includes('const ' + comp)) return false;
+            if (sanitizedCode.includes('function ' + comp)) return false;
+            if (sanitizedCode.includes('class ' + comp)) return false;
+            return true;
+          });
+          
+          if (missingComponents.length > 0) {
+            document.getElementById('preview-error').textContent = 'Composants manquants: ' + missingComponents.join(', ') + '. Ces composants sont probablement définis dans d\\'autres fichiers du projet.';
+            return;
+          }
+        }
+        
+        // Si on arrive ici, on peut essayer de rendre App
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+        
       } catch (e) {
         document.getElementById('preview-error').textContent = 'Erreur dans la preview : ' + e.message;
+        console.error('Preview error:', e);
       }
     </script>
   </body>

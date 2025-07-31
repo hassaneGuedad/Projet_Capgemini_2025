@@ -7,7 +7,7 @@ import { LLMManager } from '@/lib/modules/llm/manager';
  * @param {string} userPrompt - Le prompt original de l'utilisateur
  * @returns {string} Le prompt enrichi avec des instructions de formatage
  */
-function enrichPrompt(userPrompt: string): string {
+export function enrichPrompt(userPrompt: string): string {
   return `
 Ignore toute explication, README ou texte hors code.
 
@@ -63,7 +63,8 @@ export class LLMService {
    */
   async callModel(provider: string, model: string, prompt: string, system?: string): Promise<string> {
     try {
-      return await this.llmManager.callModel(provider, model, prompt, system);
+      const enhancedPrompt = enrichPrompt(prompt);
+      return await this.llmManager.callModel(provider, model, enhancedPrompt, system);
     } catch (error) {
       console.error(`Error calling ${provider}/${model}:`, error);
       throw error;
