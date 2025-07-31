@@ -1,6 +1,6 @@
 # 🚀 Capgemini Smart Project Builder
 
-Une plateforme intelligente de génération automatique de projets web alimentée par l'IA, développée par Capgemini Engineering.
+Une plateforme intelligente de génération automatique de projets web alimentée par l'IA, développée par Capgemini .
 
 ## 📋 Table des Matières
 
@@ -18,7 +18,7 @@ Une plateforme intelligente de génération automatique de projets web alimenté
 
 ## 🎯 Vue d'ensemble
 
-**Capgemini Smart Project Builder** est une plateforme révolutionnaire qui automatise la création de projets web complets en utilisant l'intelligence artificielle. Elle transforme une simple description textuelle en un projet fonctionnel avec architecture, code source, documentation et déploiement automatique.
+**Cap WorkSpace** est une plateforme révolutionnaire qui automatise la création de projets web complets en utilisant l'intelligence artificielle. Elle transforme une simple description textuelle en un projet fonctionnel avec architecture, code source, documentation et déploiement automatique.
 
 ### 🎪 Démonstration
 
@@ -345,12 +345,12 @@ Ce projet est développé par **Capgemini Engineering** et est propriétaire.
 ### **Support**
 
 Pour toute question ou problème :
-- **Email** : supportCapWorkSpace@gmail.com
+- **Email** : scapworkSpace@gmail.com
 - **Documentation** : Consultez le guide intégré
 - **Issues** : Utilisez le système de tickets GitHub
 
 ---
 
-**Développé avec ❤️ par l'équipe Capgemini Engineering**
+**Développé avec ❤️ par l'équipe Capgemini **
 
 *Une plateforme intelligente pour l'avenir du développement web* 
