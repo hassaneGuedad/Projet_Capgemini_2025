@@ -1,29 +1,29 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuites name="vitest tests" tests="11" failures="0" errors="0" time="0.470992">
-    <testsuite name="components/__tests__/Footer.test.tsx" timestamp="2025-08-05T13:10:50.269Z" hostname="DESKTOP-5UJ722B" tests="3" failures="0" errors="0" skipped="0" time="0.4195051">
-        <testcase classname="components/__tests__/Footer.test.tsx" name="Footer Component &gt; should render the footer" time="0.3127594">
+<testsuites name="vitest tests" tests="11" failures="0" errors="0" time="0.3169799">
+    <testsuite name="components/__tests__/Footer.test.tsx" timestamp="2025-08-05T13:33:47.833Z" hostname="DESKTOP-5UJ722B" tests="3" failures="0" errors="0" skipped="0" time="0.2832373">
+        <testcase classname="components/__tests__/Footer.test.tsx" name="Footer Component &gt; should render the footer" time="0.1867015">
         </testcase>
-        <testcase classname="components/__tests__/Footer.test.tsx" name="Footer Component &gt; should render copyright text" time="0.0315459">
+        <testcase classname="components/__tests__/Footer.test.tsx" name="Footer Component &gt; should render copyright text" time="0.0219269">
         </testcase>
-        <testcase classname="components/__tests__/Footer.test.tsx" name="Footer Component &gt; should render social media links" time="0.0711349">
+        <testcase classname="components/__tests__/Footer.test.tsx" name="Footer Component &gt; should render social media links" time="0.0652528">
         </testcase>
     </testsuite>
-    <testsuite name="services/__tests__/authorized-emails.test.ts" timestamp="2025-08-05T13:10:50.293Z" hostname="DESKTOP-5UJ722B" tests="8" failures="0" errors="0" skipped="0" time="0.0514869">
-        <testcase classname="services/__tests__/authorized-emails.test.ts" name="Authorized Emails Service &gt; addAuthorizedEmail &gt; should add an email to authorized list" time="0.0217394">
+    <testsuite name="services/__tests__/authorized-emails.test.ts" timestamp="2025-08-05T13:33:47.849Z" hostname="DESKTOP-5UJ722B" tests="8" failures="0" errors="0" skipped="0" time="0.0337426">
+        <testcase classname="services/__tests__/authorized-emails.test.ts" name="Authorized Emails Service &gt; addAuthorizedEmail &gt; should add an email to authorized list" time="0.017288">
         </testcase>
-        <testcase classname="services/__tests__/authorized-emails.test.ts" name="Authorized Emails Service &gt; addAuthorizedEmail &gt; should handle errors when adding email" time="0.0070391">
+        <testcase classname="services/__tests__/authorized-emails.test.ts" name="Authorized Emails Service &gt; addAuthorizedEmail &gt; should handle errors when adding email" time="0.000837">
         </testcase>
-        <testcase classname="services/__tests__/authorized-emails.test.ts" name="Authorized Emails Service &gt; removeAuthorizedEmail &gt; should remove an email from authorized list" time="0.0017974">
+        <testcase classname="services/__tests__/authorized-emails.test.ts" name="Authorized Emails Service &gt; removeAuthorizedEmail &gt; should remove an email from authorized list" time="0.0012901">
         </testcase>
-        <testcase classname="services/__tests__/authorized-emails.test.ts" name="Authorized Emails Service &gt; removeAuthorizedEmail &gt; should handle errors when removing email" time="0.0013876">
+        <testcase classname="services/__tests__/authorized-emails.test.ts" name="Authorized Emails Service &gt; removeAuthorizedEmail &gt; should handle errors when removing email" time="0.0008032">
         </testcase>
-        <testcase classname="services/__tests__/authorized-emails.test.ts" name="Authorized Emails Service &gt; getAuthorizedEmails &gt; should return list of authorized emails" time="0.0021449">
+        <testcase classname="services/__tests__/authorized-emails.test.ts" name="Authorized Emails Service &gt; getAuthorizedEmails &gt; should return list of authorized emails" time="0.0029623">
         </testcase>
-        <testcase classname="services/__tests__/authorized-emails.test.ts" name="Authorized Emails Service &gt; getAuthorizedEmails &gt; should return empty array when no emails found" time="0.0078816">
+        <testcase classname="services/__tests__/authorized-emails.test.ts" name="Authorized Emails Service &gt; getAuthorizedEmails &gt; should return empty array when no emails found" time="0.0054625">
         </testcase>
-        <testcase classname="services/__tests__/authorized-emails.test.ts" name="Authorized Emails Service &gt; isEmailAuthorized &gt; should return true for authorized email" time="0.0017224">
+        <testcase classname="services/__tests__/authorized-emails.test.ts" name="Authorized Emails Service &gt; isEmailAuthorized &gt; should return true for authorized email" time="0.0006582">
         </testcase>
-        <testcase classname="services/__tests__/authorized-emails.test.ts" name="Authorized Emails Service &gt; isEmailAuthorized &gt; should return false for unauthorized email" time="0.0017461">
+        <testcase classname="services/__tests__/authorized-emails.test.ts" name="Authorized Emails Service &gt; isEmailAuthorized &gt; should return false for unauthorized email" time="0.0005803">
         </testcase>
     </testsuite>
 </testsuites>
