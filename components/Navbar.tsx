@@ -276,7 +276,7 @@ export const Navbar: React.FC = () => {
                           {isLoginMode ? "Connexion..." : "Inscription..."}
                         </>
                       ) : (
-                        isLoginMode ? 'Se connecter' : "S'inscrire"
+                        isLoginMode ? 'Se connecter' : "S&apos;inscrire"
                       )}
                     </Button>
                   </form>
@@ -294,7 +294,7 @@ export const Navbar: React.FC = () => {
                       <span>
                         Pas de compte ?{' '}
                         <button type="button" className="text-blue-600 underline" onClick={() => setIsLoginMode(false)}>
-                          S'inscrire
+                          S&apos;inscrire
                         </button>
                       </span>
                     ) : (

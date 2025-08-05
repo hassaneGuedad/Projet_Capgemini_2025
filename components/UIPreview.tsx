@@ -210,7 +210,7 @@ export const UIPreview: React.FC<UIPreviewProps> = ({ components }) => {
                 ) : (
                   <div className="text-center py-8">
                     <MousePointer className="h-12 w-12 mx-auto text-gray-400 mb-2" />
-                    <p className="text-gray-500">Sélectionnez un composant pour voir l'aperçu</p>
+                    <p className="text-gray-500">Sélectionnez un composant pour voir l&apos;aperçu</p>
                   </div>
                 )}
               </div>

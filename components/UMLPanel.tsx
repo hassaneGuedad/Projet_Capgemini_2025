@@ -577,7 +577,7 @@ public class Library {
                       disabled={activeTab !== 'preview' || !diagramRendered}
                       title={
                         activeTab !== 'preview' 
-                          ? 'Ouvrez l\'onglet Prévisualisation pour télécharger en SVG'
+                          ? 'Ouvrez l&apos;onglet Prévisualisation pour télécharger en SVG'
                           : !diagramRendered 
                             ? 'Attendez que le diagramme soit chargé'
                             : 'Télécharge en SVG (convertible en PNG/JPG)'

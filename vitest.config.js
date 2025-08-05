@@ -1,9 +1,8 @@
-/// <reference types="vitest" />
-import { defineConfig } from 'vitest/config'
-import react from '@vitejs/plugin-react'
-import path from 'path'
+const { defineConfig } = require('vitest/config')
+const react = require('@vitejs/plugin-react')
+const { resolve } = require('path')
 
-export default defineConfig({
+module.exports = defineConfig({
   plugins: [react()],
   test: {
     globals: true,
@@ -40,8 +39,8 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './'),
-      '~': path.resolve(__dirname, './')
+      '@': resolve(__dirname, './'),
+      '~': resolve(__dirname, './')
     }
   }
 }) 
