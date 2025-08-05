@@ -1,7 +1,7 @@
-const { defineConfig } = require('vitest/config')
-const react = require('@vitejs/plugin-react')
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
 
-module.exports = defineConfig({
+export default defineConfig({
   plugins: [react()],
   test: {
     globals: true,
