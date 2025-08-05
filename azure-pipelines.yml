@@ -1,0 +1,132 @@
+trigger:
+  - main
+  - develop
+  - feature/*
+
+pr:
+  - main
+  - develop
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  NODE_VERSION: '18.x'
+  NPM_CACHE_FOLDER: $(Pipeline.Workspace)/.npm
+
+stages:
+- stage: Test
+  displayName: 'Test Stage'
+  jobs:
+  - job: UnitTests
+    displayName: 'Unit Tests'
+    steps:
+    - task: NodeTool@0
+      displayName: 'Install Node.js'
+      inputs:
+        versionSpec: $(NODE_VERSION)
+        checkLatest: true
+
+    - script: |
+        npm ci --cache $(NPM_CACHE_FOLDER)
+      displayName: 'Install dependencies'
+      env:
+        NPM_CONFIG_CACHE: $(NPM_CACHE_FOLDER)
+
+    - script: |
+        npm run lint
+      displayName: 'Run ESLint'
+      continueOnError: false
+
+    - script: |
+        npm run test:ci
+      displayName: 'Run unit tests with coverage'
+      continueOnError: false
+      env:
+        CI: true
+
+    - task: PublishTestResults@2
+      displayName: 'Publish test results'
+      inputs:
+        testResultsFormat: 'JUnit'
+        testResultsFiles: '**/junit.xml'
+        mergeTestResults: true
+        testRunTitle: 'Unit Tests'
+      condition: succeededOrFailed()
+
+    - task: PublishCodeCoverageResults@1
+      displayName: 'Publish code coverage'
+      inputs:
+        codeCoverageTool: 'Cobertura'
+        summaryFileLocation: '**/coverage/cobertura-coverage.xml'
+        reportDirectory: '**/coverage'
+      condition: succeededOrFailed()
+
+    - script: |
+        echo "##vso[task.logissue type=warning]Test coverage report generated"
+        echo "##vso[task.complete result=Succeeded;]"
+      displayName: 'Test coverage summary'
+      condition: succeeded()
+
+- stage: Build
+  displayName: 'Build Stage'
+  dependsOn: Test
+  condition: succeeded()
+  jobs:
+  - job: Build
+    displayName: 'Build Application'
+    steps:
+    - task: NodeTool@0
+      displayName: 'Install Node.js'
+      inputs:
+        versionSpec: $(NODE_VERSION)
+        checkLatest: true
+
+    - script: |
+        npm ci --cache $(NPM_CACHE_FOLDER)
+      displayName: 'Install dependencies'
+      env:
+        NPM_CONFIG_CACHE: $(NPM_CACHE_FOLDER)
+
+    - script: |
+        npm run build
+      displayName: 'Build Next.js application'
+      continueOnError: false
+
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish build artifacts'
+      inputs:
+        pathToPublish: '$(Build.SourcesDirectory)/project/.next'
+        artifactName: 'build'
+        publishLocation: 'Container'
+
+- stage: Deploy
+  displayName: 'Deploy Stage'
+  dependsOn: Build
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+  jobs:
+  - job: DeployToStaging
+    displayName: 'Deploy to Staging'
+    steps:
+    - script: |
+        echo "Deploying to staging environment..."
+        # Add your deployment steps here
+        # Example: Deploy to Azure Static Web Apps, Netlify, Vercel, etc.
+      displayName: 'Deploy application'
+      continueOnError: false
+
+# Post-deployment validation
+- stage: PostDeploy
+  displayName: 'Post-Deployment Validation'
+  dependsOn: Deploy
+  condition: succeeded()
+  jobs:
+  - job: SmokeTests
+    displayName: 'Smoke Tests'
+    steps:
+    - script: |
+        echo "Running smoke tests..."
+        # Add your smoke tests here
+        # Example: Check if the application is accessible
+      displayName: 'Run smoke tests'
+      continueOnError: false 
