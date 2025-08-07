@@ -4,7 +4,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { User } from '@/types';
 import AuthDialog from "@/components/AuthDialog";
 import { onAuthStateChanged, signInWithEmailAndPassword, signOut, User as FirebaseUser } from "firebase/auth";
-import { auth } from "@/lib/firebase";
+import { auth } from "@/lib/firebase-client";
 
 interface AuthContextType {
   user: User | null;
@@ -40,6 +40,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       return;
     }
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser: FirebaseUser | null) => {
+      console.log('[FIRESTORE] Auth state changed:', firebaseUser ? 'User connected' : 'No user');
       if (firebaseUser) {
         setUser({
           id: firebaseUser.uid,
@@ -52,8 +53,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
       setIsLoading(false);
     });
-    return () => unsubscribe();
-  }, []);
+
+    return () => {
+      console.log('[FIRESTORE] Cleaning up auth state listener');
+      unsubscribe();
+    };
+  }, [auth]);
 
   const login = async (email: string, password: string) => {
     setIsLoading(true);

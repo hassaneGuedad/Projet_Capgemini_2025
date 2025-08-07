@@ -13,6 +13,7 @@ const checkAuth = () => {
     throw new Error('Firebase Auth is not initialized.');
   }
   const user = auth.currentUser;
+  console.log('[FIRESTORE] Utilisateur courant:', user);
   if (!user) {
     throw new Error('User not authenticated');
   }

@@ -17,7 +17,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Code2, Home, LayoutDashboard, LogOut, User, Loader2, Menu } from 'lucide-react';
 import { createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, signOut } from "firebase/auth";
-import { auth } from "@/lib/firebase";
+import { auth } from "@/lib/firebase-client";
 
 export const Navbar: React.FC = () => {
   const { user, isAuthenticated, login, logout, isLoading } = useAuth();
@@ -276,7 +276,7 @@ export const Navbar: React.FC = () => {
                           {isLoginMode ? "Connexion..." : "Inscription..."}
                         </>
                       ) : (
-                        isLoginMode ? 'Se connecter' : "S'inscrire"
+                        isLoginMode ? 'Se connecter' : "S&apos;inscrire"
                       )}
                     </Button>
                   </form>
@@ -294,7 +294,7 @@ export const Navbar: React.FC = () => {
                       <span>
                         Pas de compte ?{' '}
                         <button type="button" className="text-blue-600 underline" onClick={() => setIsLoginMode(false)}>
-                          S'inscrire
+                          S&apos;inscrire
                         </button>
                       </span>
                     ) : (

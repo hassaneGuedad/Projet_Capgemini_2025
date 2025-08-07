@@ -1,16 +1,10 @@
-import { db } from '../lib/firebase';
-import { 
-  collection, 
-  addDoc, 
-  deleteDoc, 
-  getDocs, 
-  query, 
-  where, 
-  doc, 
+import { db } from '../lib/firebase-admin';
+import {
   Firestore,
   Timestamp,
-  DocumentData
-} from 'firebase/firestore';
+  DocumentData,
+  QueryDocumentSnapshot
+} from 'firebase-admin/firestore';
 
 export interface AuthorizedEmail {
   id?: string;
@@ -37,7 +31,7 @@ export class AuthorizedEmailService {
   // Ajouter un email autorisé
   async addAuthorizedEmail(emailData: Omit<AuthorizedEmail, 'addedAt' | 'isActive'>): Promise<string> {
     console.log('🔍 Service - Ajout email autorisé:', emailData);
-    
+
     try {
       const emailToAdd = {
         ...emailData,
@@ -48,11 +42,11 @@ export class AuthorizedEmailService {
 
       console.log('🔍 Service - Email à ajouter:', emailToAdd);
       console.log('🔍 Service - Collection:', this.collectionName);
-      
+
       const db = this.getDb();
       console.log('🔍 Service - DB initialisée:', !!db);
-      
-      const docRef = await addDoc(collection(db, this.collectionName), emailToAdd);
+
+      const docRef = await db.collection(this.collectionName).add(emailToAdd);
       console.log('✅ Email autorisé ajouté:', emailData.email, 'ID:', docRef.id);
       return docRef.id;
     } catch (error: any) {
@@ -65,7 +59,7 @@ export class AuthorizedEmailService {
   // Supprimer un email autorisé
   async removeAuthorizedEmail(emailId: string): Promise<void> {
     try {
-      await deleteDoc(doc(this.getDb(), this.collectionName, emailId));
+      await this.getDb().collection(this.collectionName).doc(emailId).delete();
       console.log('✅ Email autorisé supprimé:', emailId);
     } catch (error) {
       console.error('❌ Erreur lors de la suppression:', error);
@@ -77,15 +71,17 @@ export class AuthorizedEmailService {
   async isEmailAuthorized(email: string): Promise<boolean> {
     try {
       const normalizedEmail = email.toLowerCase().trim();
-      const q = query(
-        collection(this.getDb(), this.collectionName),
-        where('email', '==', normalizedEmail),
-        where('isActive', '==', true)
-      );
-      
-      const querySnapshot = await getDocs(q);
-      const isAuthorized = !querySnapshot.empty;
-      
+      const qSnap = await this.getDb()
+        .collection(this.collectionName)
+        .where('email', '==', normalizedEmail)
+        .where('isActive', '==', true)
+        .get();
+      // Ajout de logs détaillés pour le debug
+      console.log('DEBUG: Nombre de documents trouvés:', qSnap.size);
+      qSnap.forEach((doc: QueryDocumentSnapshot<DocumentData>) => {
+        console.log('DEBUG DOC:', doc.data());
+      });
+      const isAuthorized = !qSnap.empty;
       console.log(`🔍 Vérification email ${normalizedEmail}: ${isAuthorized ? 'AUTORISÉ' : 'NON AUTORISÉ'}`);
       return isAuthorized;
     } catch (error) {
@@ -97,14 +93,14 @@ export class AuthorizedEmailService {
   // Lister tous les emails autorisés
   async getAllAuthorizedEmails(): Promise<AuthorizedEmail[]> {
     try {
-      const q = query(collection(this.getDb(), this.collectionName), where('isActive', '==', true));
-      const querySnapshot = await getDocs(q);
-      
+      const qSnap = await this.getDb()
+        .collection(this.collectionName)
+        .where('isActive', '==', true)
+        .get();
       const emails: AuthorizedEmail[] = [];
-      querySnapshot.forEach((doc) => {
+      qSnap.forEach((doc: QueryDocumentSnapshot<DocumentData>) => {
         const data = doc.data();
         console.log('🔍 Service - Données Firestore:', data);
-        
         // Conversion sécurisée de la date
         let addedAt: Date;
         if (data.addedAt && typeof data.addedAt.toDate === 'function') {
@@ -114,7 +110,6 @@ export class AuthorizedEmailService {
         } else {
           addedAt = new Date();
         }
-        
         emails.push({
           id: doc.id,
           email: data.email,
@@ -125,7 +120,6 @@ export class AuthorizedEmailService {
           isActive: data.isActive
         });
       });
-
       return emails.sort((a, b) => a.addedAt.getTime() - b.addedAt.getTime());
     } catch (error) {
       console.error('❌ Erreur lors de la récupération des emails autorisés:', error);
@@ -149,7 +143,7 @@ export class AuthorizedEmailService {
     try {
       const emails = await this.getAllAuthorizedEmails();
       const domains: Record<string, number> = {};
-      
+
       emails.forEach(email => {
         const domain = email.email.split('@')[1];
         domains[domain] = (domains[domain] || 0) + 1;

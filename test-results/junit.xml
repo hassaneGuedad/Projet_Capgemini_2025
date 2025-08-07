@@ -1,29 +1,43 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuites name="vitest tests" tests="11" failures="0" errors="0" time="0.1961705">
-    <testsuite name="components/__tests__/Footer.test.tsx" timestamp="2025-08-05T12:17:23.357Z" hostname="DESKTOP-5UJ722B" tests="3" failures="0" errors="0" skipped="0" time="0.176469">
-        <testcase classname="components/__tests__/Footer.test.tsx" name="Footer Component &gt; should render the footer" time="0.1248679">
+<testsuites name="vitest tests" tests="16" failures="1" errors="0" time="0.6745844">
+    <testsuite name="components/__tests__/Button.test.tsx" timestamp="2025-08-06T18:21:35.255Z" hostname="DESKTOP-5UJ722B" tests="16" failures="1" errors="0" skipped="0" time="0.6745844">
+        <testcase classname="components/__tests__/Button.test.tsx" name="Button Component &gt; should render button with text" time="0.3483525">
         </testcase>
-        <testcase classname="components/__tests__/Footer.test.tsx" name="Footer Component &gt; should render copyright text" time="0.0139507">
+        <testcase classname="components/__tests__/Button.test.tsx" name="Button Component &gt; should handle click events" time="0.0549504">
         </testcase>
-        <testcase classname="components/__tests__/Footer.test.tsx" name="Footer Component &gt; should render social media links" time="0.0352531">
+        <testcase classname="components/__tests__/Button.test.tsx" name="Button Component &gt; should be disabled when disabled prop is true" time="0.0304831">
         </testcase>
-    </testsuite>
-    <testsuite name="services/__tests__/authorized-emails.test.ts" timestamp="2025-08-05T12:17:23.360Z" hostname="DESKTOP-5UJ722B" tests="8" failures="0" errors="0" skipped="0" time="0.0197015">
-        <testcase classname="services/__tests__/authorized-emails.test.ts" name="Authorized Emails Service &gt; addAuthorizedEmail &gt; should add an email to authorized list" time="0.0085646">
+        <testcase classname="components/__tests__/Button.test.tsx" name="Button Component &gt; variants &gt; should apply default variant correctly" time="0.0234109">
         </testcase>
-        <testcase classname="services/__tests__/authorized-emails.test.ts" name="Authorized Emails Service &gt; addAuthorizedEmail &gt; should handle errors when adding email" time="0.0011506">
+        <testcase classname="components/__tests__/Button.test.tsx" name="Button Component &gt; variants &gt; should apply destructive variant correctly" time="0.0265192">
         </testcase>
-        <testcase classname="services/__tests__/authorized-emails.test.ts" name="Authorized Emails Service &gt; removeAuthorizedEmail &gt; should remove an email from authorized list" time="0.0011545">
+        <testcase classname="components/__tests__/Button.test.tsx" name="Button Component &gt; variants &gt; should apply outline variant correctly" time="0.0158215">
         </testcase>
-        <testcase classname="services/__tests__/authorized-emails.test.ts" name="Authorized Emails Service &gt; removeAuthorizedEmail &gt; should handle errors when removing email" time="0.0007162">
+        <testcase classname="components/__tests__/Button.test.tsx" name="Button Component &gt; variants &gt; should apply secondary variant correctly" time="0.0196514">
         </testcase>
-        <testcase classname="services/__tests__/authorized-emails.test.ts" name="Authorized Emails Service &gt; getAuthorizedEmails &gt; should return list of authorized emails" time="0.0012668">
+        <testcase classname="components/__tests__/Button.test.tsx" name="Button Component &gt; variants &gt; should apply ghost variant correctly" time="0.0322252">
+            <failure message="[2mexpect([22m[31melement[39m[2m).toHaveClass([22m[32mexpected[39m[2m)[22m
+At least one expected class must be provided." type="Error">
+Error: expect(element).toHaveClass(expected)
+At least one expected class must be provided.
+ ❯ components/__tests__/Button.test.tsx:56:22
+            </failure>
         </testcase>
-        <testcase classname="services/__tests__/authorized-emails.test.ts" name="Authorized Emails Service &gt; getAuthorizedEmails &gt; should return empty array when no emails found" time="0.0015459">
+        <testcase classname="components/__tests__/Button.test.tsx" name="Button Component &gt; variants &gt; should apply link variant correctly" time="0.0233665">
         </testcase>
-        <testcase classname="services/__tests__/authorized-emails.test.ts" name="Authorized Emails Service &gt; isEmailAuthorized &gt; should return true for authorized email" time="0.0008537">
+        <testcase classname="components/__tests__/Button.test.tsx" name="Button Component &gt; sizes &gt; should apply default size correctly" time="0.0281432">
         </testcase>
-        <testcase classname="services/__tests__/authorized-emails.test.ts" name="Authorized Emails Service &gt; isEmailAuthorized &gt; should return false for unauthorized email" time="0.0013253">
+        <testcase classname="components/__tests__/Button.test.tsx" name="Button Component &gt; sizes &gt; should apply small size correctly" time="0.0135337">
+        </testcase>
+        <testcase classname="components/__tests__/Button.test.tsx" name="Button Component &gt; sizes &gt; should apply large size correctly" time="0.0119966">
+        </testcase>
+        <testcase classname="components/__tests__/Button.test.tsx" name="Button Component &gt; sizes &gt; should apply icon size correctly" time="0.0081626">
+        </testcase>
+        <testcase classname="components/__tests__/Button.test.tsx" name="Button Component &gt; asChild &gt; should render as child component" time="0.0111388">
+        </testcase>
+        <testcase classname="components/__tests__/Button.test.tsx" name="Button Component &gt; asChild &gt; should apply classes to child component" time="0.0038613">
+        </testcase>
+        <testcase classname="components/__tests__/Button.test.tsx" name="Button Component &gt; should apply size classes correctly" time="0.0123182">
         </testcase>
     </testsuite>
 </testsuites>

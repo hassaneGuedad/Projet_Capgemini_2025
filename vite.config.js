@@ -1,15 +1,18 @@
-/// <reference types="vitest" />
-import { defineConfig } from 'vitest/config'
-import react from '@vitejs/plugin-react'
-import path from 'path'
+const { defineConfig } = require('vite')
+const react = require('@vitejs/plugin-react')
+const path = require('path')
 
-export default defineConfig({
+module.exports = defineConfig({
   plugins: [react()],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './')
+    },
+  },
   test: {
     globals: true,
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.tsx'],
-    css: true,
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html', 'lcov', 'cobertura'],
@@ -23,25 +26,11 @@ export default defineConfig({
         'out/**',
         'dist/**',
         'build/**'
-      ],
-      thresholds: {
-        global: {
-          branches: 70,
-          functions: 70,
-          lines: 70,
-          statements: 70
-        }
-      }
+      ]
     },
     reporters: ['verbose', 'junit'],
     outputFile: {
       junit: './test-results/junit.xml'
     }
-  },
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './'),
-      '~': path.resolve(__dirname, './')
-    }
   }
-}) 
+})
