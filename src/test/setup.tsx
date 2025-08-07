@@ -45,7 +45,13 @@ vi.mock('firebase/app', () => ({
 }))
 
 vi.mock('firebase/auth', () => ({
-  getAuth: vi.fn(),
+  getAuth: vi.fn(() => ({
+    currentUser: {
+      uid: 'test-user-id',
+      email: 'test@example.com',
+      displayName: 'Test User'
+    }
+  })),
   signInWithPopup: vi.fn(),
   signOut: vi.fn(),
   onAuthStateChanged: vi.fn(),
@@ -69,6 +75,7 @@ vi.mock('firebase/firestore', () => ({
   onSnapshot: vi.fn(),
   initializeFirestore: vi.fn(),
   connectFirestoreEmulator: vi.fn(),
+  persistentLocalCache: vi.fn(),
 }))
 
 // Mock Monaco Editor

@@ -1,8 +1,14 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+const { defineConfig } = require('vite')
+const react = require('@vitejs/plugin-react')
+const path = require('path')
 
-export default defineConfig({
+module.exports = defineConfig({
   plugins: [react()],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './')
+    },
+  },
   test: {
     globals: true,
     environment: 'jsdom',
@@ -27,4 +33,4 @@ export default defineConfig({
       junit: './test-results/junit.xml'
     }
   }
-}) 
+})

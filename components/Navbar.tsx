@@ -17,7 +17,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Code2, Home, LayoutDashboard, LogOut, User, Loader2, Menu } from 'lucide-react';
 import { createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, signOut } from "firebase/auth";
-import { auth } from "@/lib/firebase";
+import { auth } from "@/lib/firebase-client";
 
 export const Navbar: React.FC = () => {
   const { user, isAuthenticated, login, logout, isLoading } = useAuth();
