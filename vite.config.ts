@@ -1,6 +1,6 @@
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
-import path from 'path';
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import path from 'path'
 
 export default defineConfig({
   plugins: [react()],
@@ -32,6 +32,6 @@ export default defineConfig({
     outputFile: {
       junit: './test-results/junit.xml',
     },
-    threads: false,  // <<<< ici on désactive les threads
+    threads: false,
   },
-});
+})
