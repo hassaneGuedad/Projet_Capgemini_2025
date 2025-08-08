@@ -33,12 +33,6 @@ stages:
       env:
         NPM_CONFIG_CACHE: $(NPM_CACHE_FOLDER)
 
-    # Temporarily disabled ESLint due to persistent errors
-    # - script: |
-    #     npm run lint
-    #   displayName: 'Run ESLint'
-    #   continueOnError: true
-
     - script: |
         npm run test:ci
       displayName: 'Run unit tests with coverage'
@@ -55,12 +49,12 @@ stages:
         testRunTitle: 'Unit Tests'
       condition: succeededOrFailed()
 
-    - task: PublishCodeCoverageResults@1
+    - task: PublishCodeCoverageResults@2
       displayName: 'Publish code coverage'
       inputs:
         codeCoverageTool: 'Cobertura'
-        summaryFileLocation: '**/coverage/cobertura-coverage.xml'
-        reportDirectory: '**/coverage'
+        summaryFileLocation: 'coverage/cobertura-coverage.xml'
+        reportDirectory: 'coverage'
       condition: succeededOrFailed()
 
     - script: |
@@ -111,12 +105,10 @@ stages:
     steps:
     - script: |
         echo "Deploying to staging environment..."
-        # Add your deployment steps here
-        # Example: Deploy to Azure Static Web Apps, Netlify, Vercel, etc.
+        # Ici ajoute ta commande de déploiement (ex: az webapp deploy, scp, etc)
       displayName: 'Deploy application'
       continueOnError: false
 
-# Post-deployment validation
 - stage: PostDeploy
   displayName: 'Post-Deployment Validation'
   dependsOn: Deploy
@@ -127,7 +119,6 @@ stages:
     steps:
     - script: |
         echo "Running smoke tests..."
-        # Add your smoke tests here
-        # Example: Check if the application is accessible
+        # Ici ajoute tes tests de validation post-déploiement
       displayName: 'Run smoke tests'
-      continueOnError: false 
+      continueOnError: false
