@@ -1,13 +1,69 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuites name="vitest tests" tests="47" failures="0" errors="0" time="1.3252407">
-    <testsuite name="contexts/AuthContext.test.tsx" timestamp="2025-08-08T14:09:41.602Z" hostname="DESKTOP-5UJ722B" tests="3" failures="0" errors="0" skipped="0" time="0.1516236">
-        <testcase classname="contexts/AuthContext.test.tsx" name="AuthProvider &gt; devrait afficher l&apos;état de chargement initialement" time="0.1019709">
+<testsuites name="vitest tests" tests="47" failures="0" errors="0" time="2.0270483">
+    <testsuite name="components/__tests__/Button.test.tsx" timestamp="2025-08-08T16:10:14.097Z" hostname="DESKTOP-5UJ722B" tests="13" failures="0" errors="0" skipped="0" time="0.7592339">
+        <testcase classname="components/__tests__/Button.test.tsx" name="Button Component &gt; should render button with text" time="0.4151221">
+        </testcase>
+        <testcase classname="components/__tests__/Button.test.tsx" name="Button Component &gt; should handle click events" time="0.0558762">
+        </testcase>
+        <testcase classname="components/__tests__/Button.test.tsx" name="Button Component &gt; should be disabled when disabled prop is true" time="0.0428941">
+        </testcase>
+        <testcase classname="components/__tests__/Button.test.tsx" name="Button Component &gt; variants &gt; should apply default variant correctly" time="0.0298071">
+        </testcase>
+        <testcase classname="components/__tests__/Button.test.tsx" name="Button Component &gt; variants &gt; should apply destructive variant correctly" time="0.0273669">
+        </testcase>
+        <testcase classname="components/__tests__/Button.test.tsx" name="Button Component &gt; variants &gt; should apply outline variant correctly" time="0.0167634">
+        </testcase>
+        <testcase classname="components/__tests__/Button.test.tsx" name="Button Component &gt; variants &gt; should apply secondary variant correctly" time="0.0175182">
+        </testcase>
+        <testcase classname="components/__tests__/Button.test.tsx" name="Button Component &gt; variants &gt; should apply ghost variant correctly" time="0.0243166">
+        </testcase>
+        <testcase classname="components/__tests__/Button.test.tsx" name="Button Component &gt; variants &gt; should apply link variant correctly" time="0.0238539">
+        </testcase>
+        <testcase classname="components/__tests__/Button.test.tsx" name="Button Component &gt; sizes &gt; should apply default size correctly" time="0.0190249">
+        </testcase>
+        <testcase classname="components/__tests__/Button.test.tsx" name="Button Component &gt; sizes &gt; should apply sm size correctly" time="0.0454059">
+        </testcase>
+        <testcase classname="components/__tests__/Button.test.tsx" name="Button Component &gt; sizes &gt; should apply lg size correctly" time="0.0187017">
+        </testcase>
+        <testcase classname="components/__tests__/Button.test.tsx" name="Button Component &gt; sizes &gt; should apply icon size correctly" time="0.0145703">
+        </testcase>
+    </testsuite>
+    <testsuite name="components/__tests__/Footer.test.tsx" timestamp="2025-08-08T16:10:14.320Z" hostname="DESKTOP-5UJ722B" tests="3" failures="0" errors="0" skipped="0" time="0.5970835">
+        <testcase classname="components/__tests__/Footer.test.tsx" name="Footer Component &gt; should render the footer" time="0.399938">
+        </testcase>
+        <testcase classname="components/__tests__/Footer.test.tsx" name="Footer Component &gt; should render copyright text" time="0.0564169">
+        </testcase>
+        <testcase classname="components/__tests__/Footer.test.tsx" name="Footer Component &gt; should render social media links" time="0.1341132">
+        </testcase>
+    </testsuite>
+    <testsuite name="components/__tests__/Input.test.tsx" timestamp="2025-08-08T16:10:14.329Z" hostname="DESKTOP-5UJ722B" tests="6" failures="0" errors="0" skipped="0" time="0.3009105">
+        <testcase classname="components/__tests__/Input.test.tsx" name="Input Component &gt; should render input with placeholder" time="0.1587211">
+        </testcase>
+        <testcase classname="components/__tests__/Input.test.tsx" name="Input Component &gt; should handle value changes" time="0.0384916">
+        </testcase>
+        <testcase classname="components/__tests__/Input.test.tsx" name="Input Component &gt; should be disabled when disabled prop is true" time="0.0168613">
+        </testcase>
+        <testcase classname="components/__tests__/Input.test.tsx" name="Input Component &gt; should apply custom className" time="0.0146974">
+        </testcase>
+        <testcase classname="components/__tests__/Input.test.tsx" name="Input Component &gt; should handle different input types" time="0.0189662">
+        </testcase>
+        <testcase classname="components/__tests__/Input.test.tsx" name="Input Component &gt; should handle controlled input" time="0.0396108">
+            <system-err>
+Warning: You provided a `value` prop to a form field without an `onChange` handler. This will render a read-only field. If the field should be mutable use `defaultValue`. Otherwise, set either `onChange` or `readOnly`.
+    at input
+    at C:\Users\youbitech\Desktop\capgemini-projet-nextjs\project\components\ui\input.tsx:9:6
+
+            </system-err>
+        </testcase>
+    </testsuite>
+    <testsuite name="contexts/AuthContext.test.tsx" timestamp="2025-08-08T16:10:14.345Z" hostname="DESKTOP-5UJ722B" tests="3" failures="0" errors="0" skipped="0" time="0.2495744">
+        <testcase classname="contexts/AuthContext.test.tsx" name="AuthProvider &gt; devrait afficher l&apos;état de chargement initialement" time="0.1165226">
             <system-out>
 [FIRESTORE] Cleaning up auth state listener
 
             </system-out>
         </testcase>
-        <testcase classname="contexts/AuthContext.test.tsx" name="AuthProvider &gt; devrait afficher les informations de l&apos;utilisateur après connexion" time="0.0247325">
+        <testcase classname="contexts/AuthContext.test.tsx" name="AuthProvider &gt; devrait afficher les informations de l&apos;utilisateur après connexion" time="0.047647">
             <system-out>
 [FIRESTORE] Auth state changed: User connected
 
@@ -15,7 +71,7 @@
 
             </system-out>
         </testcase>
-        <testcase classname="contexts/AuthContext.test.tsx" name="AuthProvider &gt; devrait gérer la déconnexion de l&apos;utilisateur" time="0.0194433">
+        <testcase classname="contexts/AuthContext.test.tsx" name="AuthProvider &gt; devrait gérer la déconnexion de l&apos;utilisateur" time="0.0779393">
             <system-out>
 [FIRESTORE] Auth state changed: User connected
 
@@ -26,112 +82,56 @@
             </system-out>
         </testcase>
     </testsuite>
-    <testsuite name="components/__tests__/Button.test.tsx" timestamp="2025-08-08T14:09:41.605Z" hostname="DESKTOP-5UJ722B" tests="13" failures="0" errors="0" skipped="0" time="0.4723546">
-        <testcase classname="components/__tests__/Button.test.tsx" name="Button Component &gt; should render button with text" time="0.2417518">
+    <testsuite name="services/__tests__/authorized-emails.test.ts" timestamp="2025-08-08T16:10:14.368Z" hostname="DESKTOP-5UJ722B" tests="8" failures="0" errors="0" skipped="0" time="0.0298383">
+        <testcase classname="services/__tests__/authorized-emails.test.ts" name="Authorized Emails Service &gt; addAuthorizedEmail &gt; should add an email to authorized list" time="0.0149052">
         </testcase>
-        <testcase classname="components/__tests__/Button.test.tsx" name="Button Component &gt; should handle click events" time="0.0304085">
+        <testcase classname="services/__tests__/authorized-emails.test.ts" name="Authorized Emails Service &gt; addAuthorizedEmail &gt; should handle errors when adding email" time="0.0013382">
         </testcase>
-        <testcase classname="components/__tests__/Button.test.tsx" name="Button Component &gt; should be disabled when disabled prop is true" time="0.0210759">
+        <testcase classname="services/__tests__/authorized-emails.test.ts" name="Authorized Emails Service &gt; removeAuthorizedEmail &gt; should remove an email from authorized list" time="0.0018674">
         </testcase>
-        <testcase classname="components/__tests__/Button.test.tsx" name="Button Component &gt; variants &gt; should apply default variant correctly" time="0.0169459">
+        <testcase classname="services/__tests__/authorized-emails.test.ts" name="Authorized Emails Service &gt; removeAuthorizedEmail &gt; should handle errors when removing email" time="0.0010213">
         </testcase>
-        <testcase classname="components/__tests__/Button.test.tsx" name="Button Component &gt; variants &gt; should apply destructive variant correctly" time="0.0197214">
+        <testcase classname="services/__tests__/authorized-emails.test.ts" name="Authorized Emails Service &gt; getAuthorizedEmails &gt; should return list of authorized emails" time="0.0016856">
         </testcase>
-        <testcase classname="components/__tests__/Button.test.tsx" name="Button Component &gt; variants &gt; should apply outline variant correctly" time="0.0157802">
+        <testcase classname="services/__tests__/authorized-emails.test.ts" name="Authorized Emails Service &gt; getAuthorizedEmails &gt; should return empty array when no emails found" time="0.0016053">
         </testcase>
-        <testcase classname="components/__tests__/Button.test.tsx" name="Button Component &gt; variants &gt; should apply secondary variant correctly" time="0.0192239">
+        <testcase classname="services/__tests__/authorized-emails.test.ts" name="Authorized Emails Service &gt; isEmailAuthorized &gt; should return true for authorized email" time="0.0009862">
         </testcase>
-        <testcase classname="components/__tests__/Button.test.tsx" name="Button Component &gt; variants &gt; should apply ghost variant correctly" time="0.0165426">
-        </testcase>
-        <testcase classname="components/__tests__/Button.test.tsx" name="Button Component &gt; variants &gt; should apply link variant correctly" time="0.0211029">
-        </testcase>
-        <testcase classname="components/__tests__/Button.test.tsx" name="Button Component &gt; sizes &gt; should apply default size correctly" time="0.0141207">
-        </testcase>
-        <testcase classname="components/__tests__/Button.test.tsx" name="Button Component &gt; sizes &gt; should apply sm size correctly" time="0.0219913">
-        </testcase>
-        <testcase classname="components/__tests__/Button.test.tsx" name="Button Component &gt; sizes &gt; should apply lg size correctly" time="0.0173547">
-        </testcase>
-        <testcase classname="components/__tests__/Button.test.tsx" name="Button Component &gt; sizes &gt; should apply icon size correctly" time="0.0097012">
+        <testcase classname="services/__tests__/authorized-emails.test.ts" name="Authorized Emails Service &gt; isEmailAuthorized &gt; should return false for unauthorized email" time="0.0010072">
         </testcase>
     </testsuite>
-    <testsuite name="components/__tests__/Footer.test.tsx" timestamp="2025-08-08T14:09:41.610Z" hostname="DESKTOP-5UJ722B" tests="3" failures="0" errors="0" skipped="0" time="0.4409927">
-        <testcase classname="components/__tests__/Footer.test.tsx" name="Footer Component &gt; should render the footer" time="0.3089165">
+    <testsuite name="lib/__tests__/utils.test.ts" timestamp="2025-08-08T16:10:14.386Z" hostname="DESKTOP-5UJ722B" tests="5" failures="0" errors="0" skipped="0" time="0.0276857">
+        <testcase classname="lib/__tests__/utils.test.ts" name="Utils Functions &gt; cn function &gt; should combine class names correctly" time="0.0203883">
         </testcase>
-        <testcase classname="components/__tests__/Footer.test.tsx" name="Footer Component &gt; should render copyright text" time="0.0294814">
+        <testcase classname="lib/__tests__/utils.test.ts" name="Utils Functions &gt; cn function &gt; should handle conditional classes" time="0.0004477">
         </testcase>
-        <testcase classname="components/__tests__/Footer.test.tsx" name="Footer Component &gt; should render social media links" time="0.0971882">
+        <testcase classname="lib/__tests__/utils.test.ts" name="Utils Functions &gt; cn function &gt; should handle false conditional classes" time="0.0020319">
         </testcase>
-    </testsuite>
-    <testsuite name="components/__tests__/Input.test.tsx" timestamp="2025-08-08T14:09:41.613Z" hostname="DESKTOP-5UJ722B" tests="6" failures="0" errors="0" skipped="0" time="0.1793901">
-        <testcase classname="components/__tests__/Input.test.tsx" name="Input Component &gt; should render input with placeholder" time="0.0879401">
+        <testcase classname="lib/__tests__/utils.test.ts" name="Utils Functions &gt; cn function &gt; should handle undefined and null values" time="0.0005522">
         </testcase>
-        <testcase classname="components/__tests__/Input.test.tsx" name="Input Component &gt; should handle value changes" time="0.0168099">
-        </testcase>
-        <testcase classname="components/__tests__/Input.test.tsx" name="Input Component &gt; should be disabled when disabled prop is true" time="0.0138403">
-        </testcase>
-        <testcase classname="components/__tests__/Input.test.tsx" name="Input Component &gt; should apply custom className" time="0.0095535">
-        </testcase>
-        <testcase classname="components/__tests__/Input.test.tsx" name="Input Component &gt; should handle different input types" time="0.012016">
-        </testcase>
-        <testcase classname="components/__tests__/Input.test.tsx" name="Input Component &gt; should handle controlled input" time="0.0340244">
-            <system-err>
-Warning: You provided a `value` prop to a form field without an `onChange` handler. This will render a read-only field. If the field should be mutable use `defaultValue`. Otherwise, set either `onChange` or `readOnly`.
-    at input
-    at C:\Users\youbitech\Desktop\capgemini-projet-nextjs\project\components\ui\input.tsx:9:6
-
-            </system-err>
+        <testcase classname="lib/__tests__/utils.test.ts" name="Utils Functions &gt; cn function &gt; should handle empty strings" time="0.0007256">
         </testcase>
     </testsuite>
-    <testsuite name="services/__tests__/authorized-emails.test.ts" timestamp="2025-08-08T14:09:41.616Z" hostname="DESKTOP-5UJ722B" tests="8" failures="0" errors="0" skipped="0" time="0.0221223">
-        <testcase classname="services/__tests__/authorized-emails.test.ts" name="Authorized Emails Service &gt; addAuthorizedEmail &gt; should add an email to authorized list" time="0.0113441">
+    <testsuite name="app/api/contact/route.test.ts" timestamp="2025-08-08T16:10:14.399Z" hostname="DESKTOP-5UJ722B" tests="3" failures="0" errors="0" skipped="0" time="0.0470673">
+        <testcase classname="app/api/contact/route.test.ts" name="API Route: /api/contact &gt; should return 200 OK and success:true on valid submission" time="0.0286">
         </testcase>
-        <testcase classname="services/__tests__/authorized-emails.test.ts" name="Authorized Emails Service &gt; addAuthorizedEmail &gt; should handle errors when adding email" time="0.0010368">
+        <testcase classname="app/api/contact/route.test.ts" name="API Route: /api/contact &gt; should return 400 Bad Request if fields are missing" time="0.0074309">
         </testcase>
-        <testcase classname="services/__tests__/authorized-emails.test.ts" name="Authorized Emails Service &gt; removeAuthorizedEmail &gt; should remove an email from authorized list" time="0.0011362">
-        </testcase>
-        <testcase classname="services/__tests__/authorized-emails.test.ts" name="Authorized Emails Service &gt; removeAuthorizedEmail &gt; should handle errors when removing email" time="0.0007709">
-        </testcase>
-        <testcase classname="services/__tests__/authorized-emails.test.ts" name="Authorized Emails Service &gt; getAuthorizedEmails &gt; should return list of authorized emails" time="0.0012716">
-        </testcase>
-        <testcase classname="services/__tests__/authorized-emails.test.ts" name="Authorized Emails Service &gt; getAuthorizedEmails &gt; should return empty array when no emails found" time="0.0012552">
-        </testcase>
-        <testcase classname="services/__tests__/authorized-emails.test.ts" name="Authorized Emails Service &gt; isEmailAuthorized &gt; should return true for authorized email" time="0.0008592">
-        </testcase>
-        <testcase classname="services/__tests__/authorized-emails.test.ts" name="Authorized Emails Service &gt; isEmailAuthorized &gt; should return false for unauthorized email" time="0.0010264">
+        <testcase classname="app/api/contact/route.test.ts" name="API Route: /api/contact &gt; should return 500 Internal Server Error if sendMail fails" time="0.0064772">
         </testcase>
     </testsuite>
-    <testsuite name="services/__tests__/validation.test.ts" timestamp="2025-08-08T14:09:41.621Z" hostname="DESKTOP-5UJ722B" tests="6" failures="0" errors="0" skipped="0" time="0.0103177">
-        <testcase classname="services/__tests__/validation.test.ts" name="Validation Service &gt; Email Validation &gt; should validate correct email addresses" time="0.0036376">
+    <testsuite name="services/__tests__/validation.test.ts" timestamp="2025-08-08T16:10:14.407Z" hostname="DESKTOP-5UJ722B" tests="6" failures="0" errors="0" skipped="0" time="0.0156547">
+        <testcase classname="services/__tests__/validation.test.ts" name="Validation Service &gt; Email Validation &gt; should validate correct email addresses" time="0.0046183">
         </testcase>
-        <testcase classname="services/__tests__/validation.test.ts" name="Validation Service &gt; Email Validation &gt; should reject invalid email addresses" time="0.0006256">
+        <testcase classname="services/__tests__/validation.test.ts" name="Validation Service &gt; Email Validation &gt; should reject invalid email addresses" time="0.0007055">
         </testcase>
-        <testcase classname="services/__tests__/validation.test.ts" name="Validation Service &gt; Email Validation &gt; should handle edge cases" time="0.0007773">
+        <testcase classname="services/__tests__/validation.test.ts" name="Validation Service &gt; Email Validation &gt; should handle edge cases" time="0.0011343">
         </testcase>
-        <testcase classname="services/__tests__/validation.test.ts" name="Validation Service &gt; Password Validation &gt; should validate strong passwords" time="0.0006824">
+        <testcase classname="services/__tests__/validation.test.ts" name="Validation Service &gt; Password Validation &gt; should validate strong passwords" time="0.001788">
         </testcase>
-        <testcase classname="services/__tests__/validation.test.ts" name="Validation Service &gt; Password Validation &gt; should reject weak passwords" time="0.000482">
+        <testcase classname="services/__tests__/validation.test.ts" name="Validation Service &gt; Password Validation &gt; should reject weak passwords" time="0.0011783">
         </testcase>
-        <testcase classname="services/__tests__/validation.test.ts" name="Validation Service &gt; Password Validation &gt; should handle edge cases" time="0.0003608">
-        </testcase>
-    </testsuite>
-    <testsuite name="lib/__tests__/utils.test.ts" timestamp="2025-08-08T14:09:41.625Z" hostname="DESKTOP-5UJ722B" tests="5" failures="0" errors="0" skipped="0" time="0.0154067">
-        <testcase classname="lib/__tests__/utils.test.ts" name="Utils Functions &gt; cn function &gt; should combine class names correctly" time="0.010655">
-        </testcase>
-        <testcase classname="lib/__tests__/utils.test.ts" name="Utils Functions &gt; cn function &gt; should handle conditional classes" time="0.0005326">
-        </testcase>
-        <testcase classname="lib/__tests__/utils.test.ts" name="Utils Functions &gt; cn function &gt; should handle false conditional classes" time="0.0005483">
-        </testcase>
-        <testcase classname="lib/__tests__/utils.test.ts" name="Utils Functions &gt; cn function &gt; should handle undefined and null values" time="0.0003945">
-        </testcase>
-        <testcase classname="lib/__tests__/utils.test.ts" name="Utils Functions &gt; cn function &gt; should handle empty strings" time="0.0002948">
-        </testcase>
-    </testsuite>
-    <testsuite name="app/api/contact/route.test.ts" timestamp="2025-08-08T14:09:41.627Z" hostname="DESKTOP-5UJ722B" tests="3" failures="0" errors="0" skipped="0" time="0.033033">
-        <testcase classname="app/api/contact/route.test.ts" name="API Route: /api/contact &gt; should return 200 OK and success:true on valid submission" time="0.0242662">
-        </testcase>
-        <testcase classname="app/api/contact/route.test.ts" name="API Route: /api/contact &gt; should return 400 Bad Request if fields are missing" time="0.0027376">
-        </testcase>
-        <testcase classname="app/api/contact/route.test.ts" name="API Route: /api/contact &gt; should return 500 Internal Server Error if sendMail fails" time="0.0030291">
+        <testcase classname="services/__tests__/validation.test.ts" name="Validation Service &gt; Password Validation &gt; should handle edge cases" time="0.000917">
         </testcase>
     </testsuite>
 </testsuites>
