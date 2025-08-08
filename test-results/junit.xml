@@ -1,43 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuites name="vitest tests" tests="16" failures="1" errors="0" time="0.6745844">
-    <testsuite name="components/__tests__/Button.test.tsx" timestamp="2025-08-06T18:21:35.255Z" hostname="DESKTOP-5UJ722B" tests="16" failures="1" errors="0" skipped="0" time="0.6745844">
-        <testcase classname="components/__tests__/Button.test.tsx" name="Button Component &gt; should render button with text" time="0.3483525">
+<testsuites name="vitest tests" tests="3" failures="0" errors="0" time="0.0288025">
+    <testsuite name="app/api/contact/route.test.ts" timestamp="2025-08-08T13:54:26.694Z" hostname="DESKTOP-5UJ722B" tests="3" failures="0" errors="0" skipped="0" time="0.0288025">
+        <testcase classname="app/api/contact/route.test.ts" name="API Route: /api/contact &gt; should return 200 OK and success:true on valid submission" time="0.0222322">
         </testcase>
-        <testcase classname="components/__tests__/Button.test.tsx" name="Button Component &gt; should handle click events" time="0.0549504">
+        <testcase classname="app/api/contact/route.test.ts" name="API Route: /api/contact &gt; should return 400 Bad Request if fields are missing" time="0.0017989">
         </testcase>
-        <testcase classname="components/__tests__/Button.test.tsx" name="Button Component &gt; should be disabled when disabled prop is true" time="0.0304831">
-        </testcase>
-        <testcase classname="components/__tests__/Button.test.tsx" name="Button Component &gt; variants &gt; should apply default variant correctly" time="0.0234109">
-        </testcase>
-        <testcase classname="components/__tests__/Button.test.tsx" name="Button Component &gt; variants &gt; should apply destructive variant correctly" time="0.0265192">
-        </testcase>
-        <testcase classname="components/__tests__/Button.test.tsx" name="Button Component &gt; variants &gt; should apply outline variant correctly" time="0.0158215">
-        </testcase>
-        <testcase classname="components/__tests__/Button.test.tsx" name="Button Component &gt; variants &gt; should apply secondary variant correctly" time="0.0196514">
-        </testcase>
-        <testcase classname="components/__tests__/Button.test.tsx" name="Button Component &gt; variants &gt; should apply ghost variant correctly" time="0.0322252">
-            <failure message="[2mexpect([22m[31melement[39m[2m).toHaveClass([22m[32mexpected[39m[2m)[22m
-At least one expected class must be provided." type="Error">
-Error: expect(element).toHaveClass(expected)
-At least one expected class must be provided.
- ❯ components/__tests__/Button.test.tsx:56:22
-            </failure>
-        </testcase>
-        <testcase classname="components/__tests__/Button.test.tsx" name="Button Component &gt; variants &gt; should apply link variant correctly" time="0.0233665">
-        </testcase>
-        <testcase classname="components/__tests__/Button.test.tsx" name="Button Component &gt; sizes &gt; should apply default size correctly" time="0.0281432">
-        </testcase>
-        <testcase classname="components/__tests__/Button.test.tsx" name="Button Component &gt; sizes &gt; should apply small size correctly" time="0.0135337">
-        </testcase>
-        <testcase classname="components/__tests__/Button.test.tsx" name="Button Component &gt; sizes &gt; should apply large size correctly" time="0.0119966">
-        </testcase>
-        <testcase classname="components/__tests__/Button.test.tsx" name="Button Component &gt; sizes &gt; should apply icon size correctly" time="0.0081626">
-        </testcase>
-        <testcase classname="components/__tests__/Button.test.tsx" name="Button Component &gt; asChild &gt; should render as child component" time="0.0111388">
-        </testcase>
-        <testcase classname="components/__tests__/Button.test.tsx" name="Button Component &gt; asChild &gt; should apply classes to child component" time="0.0038613">
-        </testcase>
-        <testcase classname="components/__tests__/Button.test.tsx" name="Button Component &gt; should apply size classes correctly" time="0.0123182">
+        <testcase classname="app/api/contact/route.test.ts" name="API Route: /api/contact &gt; should return 500 Internal Server Error if sendMail fails" time="0.0022062">
         </testcase>
     </testsuite>
 </testsuites>
