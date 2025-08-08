@@ -1,37 +1,18 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import path from 'path'
 
 export default defineConfig({
   plugins: [react()],
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './'),
-    },
-  },
   test: {
-    globals: true,
-    environment: 'jsdom',
-    setupFiles: ['./src/test/setup.tsx'],
+    globals: true,          // permet d'utiliser les globals comme describe, it, expect sans import
+    environment: 'jsdom',   // simule un navigateur pour les tests React
     coverage: {
-      provider: 'v8',
-      reporter: ['text', 'json', 'html', 'lcov', 'cobertura'],
-      exclude: [
-        'node_modules/',
-        'src/test/',
-        '**/*.d.ts',
-        '**/*.config.*',
-        '**/coverage/**',
-        '.next/**',
-        'out/**',
-        'dist/**',
-        'build/**',
-      ],
+      provider: 'v8',       // coverage avec V8 (rapide et simple)
+      reporter: ['text', 'json', 'html'], // formats de rapport de couverture
+      all: true,            // mesurer la couverture de tous les fichiers, même non testés
+      include: ['src/**/*.{js,jsx,ts,tsx}'], // dossiers/fichiers à inclure
+      exclude: ['node_modules/', 'test/'],   // dossiers à exclure
     },
-    reporters: ['verbose', 'junit'],
-    outputFile: {
-      junit: './test-results/junit.xml',
-    },
-    threads: false,
+    maxThreads: 1,          // option pour la CI (évite certains problèmes)
   },
 })
