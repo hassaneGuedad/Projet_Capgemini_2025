@@ -12,7 +12,9 @@
     "test:ui": "vitest --ui",
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage",
-    "test:ci": "vitest run --coverage --reporter=verbose --reporter=junit --exit "
+  
+    "test:ci": "vitest run --coverage --reporter=verbose --reporter=junit --outputFile=junit.xml"
+
 
   },
   "dependencies": {
