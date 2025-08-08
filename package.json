@@ -12,7 +12,8 @@
     "test:ui": "vitest --ui",
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage",
-    "test:ci": "vitest run --coverage --reporter=verbose --reporter=junit"
+    "test:ci": "vitest run --coverage --reporter=verbose --reporter=junit --maxThreads=1"
+
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
