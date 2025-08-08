@@ -1,18 +1,17 @@
 import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
 
+// https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react()],
   test: {
-    globals: true,          // permet d'utiliser les globals comme describe, it, expect sans import
-    environment: 'jsdom',   // simule un navigateur pour les tests React
-    coverage: {
-      provider: 'v8',       // coverage avec V8 (rapide et simple)
-      reporter: ['text', 'json', 'html'], // formats de rapport de couverture
-      all: true,            // mesurer la couverture de tous les fichiers, même non testés
-      include: ['src/**/*.{js,jsx,ts,tsx}'], // dossiers/fichiers à inclure
-      exclude: ['node_modules/', 'test/'],   // dossiers à exclure
+    environment: 'node',           // Exécuter les tests dans un environnement Node.js
+    deps: {
+      external: ['nodemailer'],    // Ne pas transformer nodemailer (module Node)
+      inline: []                   // Autres dépendances à bundler (laisse vide si pas besoin)
     },
-    maxThreads: 1,          // option pour la CI (évite certains problèmes)
+    coverage: {
+      provider: 'v8',              // Utilise le provider v8 pour coverage (rapide et simple)
+      reporter: ['text', 'json', 'html'], // Rapports de couverture
+    },
+    reporters: ['verbose', 'junit'], // Reporters pour vitest
   },
 })
