@@ -1,17 +1,28 @@
 import { defineConfig } from 'vite'
 
-// https://vitejs.dev/config/
 export default defineConfig({
-  test: {
-    environment: 'node',           // Exécuter les tests dans un environnement Node.js
+  // Configuration du serveur dev et optimisation des dépendances
+  server: {
     deps: {
-      external: ['nodemailer'],    // Ne pas transformer nodemailer (module Node)
-      inline: []                   // Autres dépendances à bundler (laisse vide si pas besoin)
-    },
-    coverage: {
-      provider: 'v8',              // Utilise le provider v8 pour coverage (rapide et simple)
-      reporter: ['text', 'json', 'html'], // Rapports de couverture
-    },
-    reporters: ['verbose', 'junit'], // Reporters pour vitest
+      inline: ['nodemailer'],  // Forcer l'inclusion en inline dans le serveur dev
+      external: []             // Liste si besoin de packages à exclure
+    }
   },
+
+  optimizeDeps: {
+    include: ['nodemailer'],  // Forcer l'optimisation de ce package en build dev
+    exclude: []
+  },
+
+  ssr: {
+    noExternal: ['nodemailer']  // Empêche nodemailer d'être externalisé en SSR (test, build)
+  },
+
+  test: {
+    globals: true,
+    environment: 'node',
+    coverage: {
+      reporter: ['text', 'lcov']
+    }
+  }
 })
