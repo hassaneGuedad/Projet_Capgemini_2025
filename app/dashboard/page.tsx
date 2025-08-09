@@ -697,41 +697,55 @@ export default function Dashboard() {
           </div>
 
           {/* Project Status */}
-          <Card className="border-0 shadow-lg bg-white/60 backdrop-blur-sm">
+          <Card className="border-none shadow-lg overflow-hidden rounded-2xl bg-white/70 backdrop-blur">
+            <div className="relative h-1 w-full bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-500" />
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div className="space-y-2">
-                  <div className="flex items-center space-x-2">
-                    <h3 className="text-lg font-semibold text-gray-900">Statut du projet</h3>
-                    <Badge variant="outline" className={getStatusColor()}>
+                  <div className="flex items-center gap-3">
+                    <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50 text-blue-600 ring-1 ring-blue-100">
                       {getStatusIcon()}
-                      <span className="ml-2">{getStatusLabel()}</span>
-                    </Badge>
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-lg font-extrabold text-gray-900">Statut du projet</h3>
+                      <Badge variant="outline" className={getStatusColor()}>
+                        <span className="ml-0">{getStatusLabel()}</span>
+                      </Badge>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs">
+                    <span className={`px-2 py-0.5 rounded-full ${generationStatus === 'idle' ? 'bg-gray-200 text-gray-800' : 'bg-gray-100 text-gray-500'}`}>En attente</span>
+                    <span className={`px-2 py-0.5 rounded-full ${generationStatus === 'generating' ? 'bg-blue-200 text-blue-800' : 'bg-gray-100 text-gray-500'}`}>Génération</span>
+                    <span className={`px-2 py-0.5 rounded-full ${generationStatus === 'completed' ? 'bg-green-200 text-green-800' : 'bg-gray-100 text-gray-500'}`}>Terminé</span>
                   </div>
                   {currentPrompt && (
-                    <div className="text-sm text-gray-600 max-w-2xl flex items-start gap-2">
-                      <span className="font-medium">Prompt utilisé:</span>
-                      <span>
-                        {currentPrompt.length > 200 && !showFullPrompt
-                          ? currentPrompt.slice(0, 200) + '...'
-                          : currentPrompt}
-                      </span>
-                      {currentPrompt.length > 200 && (
-                        <button
-                          onClick={() => setShowFullPrompt(v => !v)}
-                          className="ml-2 text-blue-600 hover:text-blue-800 text-xs flex items-center"
-                          aria-label={showFullPrompt ? 'Masquer le prompt' : 'Afficher tout le prompt'}
-                        >
-                          {showFullPrompt ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                        </button>
-                      )}
+                    <div className="text-sm text-gray-700 max-w-3xl">
+                      <div className="p-3 rounded-lg bg-gray-50 border">
+                        <div className="flex items-start gap-2">
+                          <span className="font-medium text-gray-900">Prompt utilisé:</span>
+                          <span>
+                            {currentPrompt.length > 260 && !showFullPrompt
+                              ? currentPrompt.slice(0, 260) + '...'
+                              : currentPrompt}
+                          </span>
+                          {currentPrompt.length > 260 && (
+                            <button
+                              onClick={() => setShowFullPrompt(v => !v)}
+                              className="ml-2 text-blue-600 hover:text-blue-800 text-xs inline-flex items-center"
+                              aria-label={showFullPrompt ? 'Masquer le prompt' : 'Afficher tout le prompt'}
+                            >
+                              {showFullPrompt ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                            </button>
+                          )}
+                        </div>
+                      </div>
                     </div>
                   )}
                 </div>
                 <div className="text-right space-y-2">
-                  <div className="flex items-center space-x-2">
-                    <Progress value={progress} className="w-32" />
-                    <span className="text-sm font-medium">{progress}%</span>
+                  <div className="flex items-center space-x-3">
+                    <Progress value={progress} className="w-64 h-3" />
+                    <span className="text-sm font-semibold text-gray-700">{progress}%</span>
                   </div>
                 </div>
               </div>

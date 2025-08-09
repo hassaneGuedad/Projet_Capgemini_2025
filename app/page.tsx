@@ -143,14 +143,27 @@ export default function Home() {
           </p>
           
           {/* Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-2xl mx-auto mt-12">
+          <div className="flex justify-center gap-3 mt-2">
+            <a href="#generate">
+              <Button className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-700 hover:via-indigo-700 hover:to-purple-700 text-white shadow">
+                Commencer
+              </Button>
+            </a>
+            <a href="/guide">
+              <Button variant="outline" className="border-blue-200 text-blue-700 hover:bg-blue-50">
+                Voir un exemple
+              </Button>
+            </a>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto mt-8">
             {stats.map((stat, index) => (
-              <div key={index} className="text-center space-y-2">
-                <div className="flex justify-center text-blue-500">
+              <div key={index} className="rounded-xl bg-white/70 backdrop-blur border p-4 text-center shadow-sm">
+                <div className="flex justify-center text-blue-500 mb-1">
                   {stat.icon}
                 </div>
-                <div className="text-2xl font-bold text-gray-900">{stat.value}</div>
-                <div className="text-sm text-gray-500">{stat.label}</div>
+                <div className="text-2xl font-extrabold text-gray-900 leading-none">{stat.value}</div>
+                <div className="text-xs text-gray-500">{stat.label}</div>
               </div>
             ))}
           </div>
@@ -174,8 +187,16 @@ export default function Home() {
         )}
 
         {/* Form Section */}
-        <div className="mb-16">
-          <PromptForm />
+        <div id="generate" className="max-w-3xl mx-auto mb-16">
+          <Card className="border-0 shadow-lg bg-white/70 backdrop-blur rounded-2xl">
+            <CardContent className="p-6">
+              <div className="text-center mb-4">
+                <h2 className="text-2xl font-bold text-gray-900">Décrivez votre projet</h2>
+                <p className="text-sm text-gray-600">Expliquez vos objectifs, vos fonctionnalités et vos contraintes.</p>
+              </div>
+              <PromptForm />
+            </CardContent>
+          </Card>
         </div>
 
         {/* Features Section */}
@@ -212,45 +233,68 @@ export default function Home() {
         </div>
 
         {/* Process Section */}
-        <div className="max-w-4xl mx-auto mt-20">
+        <div className="max-w-5xl mx-auto mt-20">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Comment ça marche ?
-            </h2>
-            <p className="text-lg text-gray-600">
-              Un processus simple et efficace en 3 étapes
-            </p>
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Comment ça marche ?</h2>
+            <p className="text-lg text-gray-600">Un processus simple et efficace en 3 étapes</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center space-y-4">
-              <div className="w-16 h-16 mx-auto bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-xl">
-                1
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[1,2,3].map((n, i) => (
+              <div key={i} className="rounded-2xl bg-white/70 backdrop-blur border p-6 text-center shadow-sm">
+                <div className={`w-12 h-12 mx-auto rounded-full flex items-center justify-center text-white font-bold mb-3 ${
+                  n === 1 ? 'bg-gradient-to-r from-blue-500 to-purple-600' : n === 2 ? 'bg-gradient-to-r from-purple-500 to-pink-600' : 'bg-gradient-to-r from-green-500 to-teal-600'
+                }`}>
+                  {n}
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900">
+                  {n === 1 ? 'Décrivez votre projet' : n === 2 ? "L'IA planifie" : 'Obtenez votre code'}
+                </h3>
+                <p className="text-gray-600 text-sm">
+                  {n === 1
+                    ? 'Expliquez votre vision en détail. Plus vous êtes précis, meilleur sera le résultat.'
+                    : n === 2
+                    ? 'Nos agents IA analysent votre demande et créent un plan technique détaillé.'
+                    : 'Récupérez un projet complet avec du code propre et bien documenté.'}
+                </p>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900">Décrivez votre projet</h3>
-              <p className="text-gray-600">
-                Expliquez votre vision en détail. Plus vous êtes précis, meilleur sera le résultat.
-              </p>
-            </div>
+            ))}
+          </div>
+        </div>
 
-            <div className="text-center space-y-4">
-              <div className="w-16 h-16 mx-auto bg-gradient-to-r from-purple-500 to-pink-600 rounded-full flex items-center justify-center text-white font-bold text-xl">
-                2
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900">L'IA planifie</h3>
-              <p className="text-gray-600">
-                Nos agents IA analysent votre demande et créent un plan technique détaillé.
-              </p>
-            </div>
+        {/* Trusted by */}
+        <div className="max-w-5xl mx-auto mt-16 text-center">
+          <p className="text-sm text-gray-500">Ils nous font confiance</p>
+          <div className="mt-4 flex flex-wrap justify-center gap-4 opacity-80">
+            <span className="inline-flex items-center rounded-md ring-1 ring-gray-200 px-3 py-1 text-xs text-gray-600">Acme Corp</span>
+            <span className="inline-flex items-center rounded-md ring-1 ring-gray-200 px-3 py-1 text-xs text-gray-600">DevHouse</span>
+            <span className="inline-flex items-center rounded-md ring-1 ring-gray-200 px-3 py-1 text-xs text-gray-600">Cloudify</span>
+            <span className="inline-flex items-center rounded-md ring-1 ring-gray-200 px-3 py-1 text-xs text-gray-600">WebLabs</span>
+          </div>
+        </div>
 
-            <div className="text-center space-y-4">
-              <div className="w-16 h-16 mx-auto bg-gradient-to-r from-green-500 to-teal-600 rounded-full flex items-center justify-center text-white font-bold text-xl">
-                3
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900">Obtenez votre code</h3>
-              <p className="text-gray-600">
-                Récupérez un projet complet avec du code propre et bien documenté.
-              </p>
+        {/* FAQ */}
+        <div className="max-w-4xl mx-auto mt-16">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl font-bold text-gray-900">FAQ</h2>
+            <p className="text-sm text-gray-600">Les réponses aux questions les plus fréquentes</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="rounded-xl bg-white/70 backdrop-blur border p-4 shadow-sm">
+              <div className="font-semibold text-gray-900 mb-1">Puis-je modifier le code généré ?</div>
+              <div className="text-sm text-gray-600">Oui, via l'éditeur intégré et le chatbot pour des ajustements rapides.</div>
+            </div>
+            <div className="rounded-xl bg-white/70 backdrop-blur border p-4 shadow-sm">
+              <div className="font-semibold text-gray-900 mb-1">Comment exporter mon projet ?</div>
+              <div className="text-sm text-gray-600">Utilisez l'option de téléchargement ZIP dans le dashboard.</div>
+            </div>
+            <div className="rounded-xl bg-white/70 backdrop-blur border p-4 shadow-sm">
+              <div className="font-semibold text-gray-900 mb-1">Quels types de projets sont supportés ?</div>
+              <div className="text-sm text-gray-600">Front-end, back-end, APIs, intégrations base de données, et plus.</div>
+            </div>
+            <div className="rounded-xl bg-white/70 backdrop-blur border p-4 shadow-sm">
+              <div className="font-semibold text-gray-900 mb-1">Les emails sont-ils restreints ?</div>
+              <div className="text-sm text-gray-600">Oui, seuls les emails autorisés par l'administrateur peuvent accéder.</div>
             </div>
           </div>
         </div>

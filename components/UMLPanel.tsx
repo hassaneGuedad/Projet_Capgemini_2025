@@ -447,14 +447,22 @@ public class Library {
   return (
     <div className="space-y-6">
       {/* En-tête */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900">Générateur UML</h2>
-          <p className="text-gray-600">Analyse automatique du code et génération de diagrammes</p>
+      <div className="relative overflow-hidden rounded-2xl border bg-white/60 backdrop-blur-sm shadow-md">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(147,51,234,0.12),transparent_40%),radial-gradient(ellipse_at_bottom_left,rgba(59,130,246,0.12),transparent_40%)]" />
+        <div className="relative p-6 flex items-center justify-between">
+          <div className="flex items-start gap-4">
+            <span className="inline-flex items-center justify-center rounded-xl bg-gradient-to-br from-purple-500/15 to-blue-500/15 text-purple-600 ring-1 ring-purple-500/20 h-12 w-12">
+              <BarChart3 className="h-6 w-6" />
+            </span>
+            <div>
+              <h2 className="text-2xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-blue-600">Générateur UML</h2>
+              <p className="text-sm text-gray-600 mt-1">Analyse automatique du code et génération de diagrammes</p>
+            </div>
+          </div>
+          <Badge variant="secondary" className="bg-blue-600/10 text-blue-700 ring-1 ring-blue-600/20 rounded-full px-3 py-1">
+            {files.length > 0 ? `${files.length} fichiers` : 'Mode démo'}
+          </Badge>
         </div>
-        <Badge variant="secondary" className="bg-blue-100 text-blue-800">
-          {files.length > 0 ? `${files.length} fichiers` : 'Mode démo'}
-        </Badge>
       </div>
 
       {/* Sélection du type de diagramme */}
@@ -466,32 +474,50 @@ public class Library {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <fieldset className="space-y-3">
+            <legend className="sr-only">Type de diagramme</legend>
             {diagramTypes.map((diagramType) => {
               const Icon = diagramType.icon;
+              const selected = selectedDiagram === diagramType.value;
               return (
-                <div
+                <label
                   key={diagramType.value}
-                  className={`p-4 border rounded-lg cursor-pointer transition-all ${
-                    selectedDiagram === diagramType.value
-                      ? 'border-blue-500 bg-blue-50'
-                      : 'border-gray-200 hover:border-gray-300'
+                  className={`flex w-full items-center gap-4 rounded-xl border bg-white/60 backdrop-blur-sm p-4 min-h-[80px] transition hover:shadow-sm cursor-pointer ${
+                    selected ? 'border-blue-500/50 ring-2 ring-blue-500/20' : 'border-gray-200'
                   }`}
-                  onClick={() => setSelectedDiagram(diagramType.value)}
                 >
-                  <div className="flex items-center gap-3">
-                    <Icon className={`w-6 h-6 ${
-                      selectedDiagram === diagramType.value ? 'text-blue-600' : 'text-gray-600'
-                    }`} />
-                    <div>
-                      <h3 className="font-medium">{diagramType.label}</h3>
-                      <p className="text-sm text-gray-600">{diagramType.description}</p>
+                  <input
+                    type="radio"
+                    name="diagramType"
+                    value={diagramType.value}
+                    checked={selected}
+                    onChange={() => setSelectedDiagram(diagramType.value)}
+                    className="sr-only"
+                  />
+                  <span
+                    className={`inline-flex h-10 w-10 items-center justify-center rounded-lg ring-1 ${
+                      selected ? 'ring-blue-400/50' : 'ring-gray-200'
+                    } bg-gradient-to-br ${
+                      diagramType.value === 'class' ? 'from-blue-50 to-blue-100 text-blue-600' :
+                      diagramType.value === 'component' ? 'from-emerald-50 to-emerald-100 text-emerald-600' :
+                      diagramType.value === 'sequence' ? 'from-purple-50 to-purple-100 text-purple-600' :
+                      diagramType.value === 'activity' ? 'from-amber-50 to-amber-100 text-amber-600' :
+                      'from-rose-50 to-rose-100 text-rose-600'
+                    }`}
+                  >
+                    <Icon className="h-5 w-5" />
+                  </span>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-medium text-gray-900">{diagramType.label}</h3>
+                      <span className={`h-4 w-4 rounded-full border ${selected ? 'border-blue-600 bg-blue-600' : 'border-gray-300 bg-white'}`} />
                     </div>
+                    <p className="text-sm text-gray-600">{diagramType.description}</p>
                   </div>
-                </div>
+                </label>
               );
             })}
-          </div>
+          </fieldset>
         </CardContent>
       </Card>
 
@@ -502,7 +528,7 @@ public class Library {
             <Button
               onClick={generateDiagram}
               disabled={loading}
-              className="w-full flex items-center gap-2"
+              className="w-full flex items-center gap-2 bg-gradient-to-r from-violet-600 via-blue-600 to-cyan-600 hover:from-violet-700 hover:via-blue-700 hover:to-cyan-700 text-white shadow-lg shadow-blue-500/20"
               size="lg"
             >
               {loading ? (
@@ -531,7 +557,7 @@ public class Library {
 
       {/* Résultats */}
       {error && (
-        <Card className="border-red-200 bg-red-50">
+        <Card className="border-red-200 bg-red-50/80 backdrop-blur-sm shadow-sm">
           <CardContent className="pt-6">
             <div className="flex items-center gap-2 text-red-700">
               <BarChart3 className="w-5 h-5" />
@@ -614,19 +640,19 @@ public class Library {
 
             {/* Onglets pour prévisualisation et code */}
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="preview" className="flex items-center gap-1">
+              <TabsList className="grid w-full grid-cols-2 bg-gray-50 rounded-lg p-1">
+                <TabsTrigger value="preview" className="flex items-center gap-1 rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm">
                   <Eye className="w-4 h-4" />
                   Prévisualisation
                 </TabsTrigger>
-                <TabsTrigger value="code" className="flex items-center gap-1">
+                <TabsTrigger value="code" className="flex items-center gap-1 rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm">
                   <Code className="w-4 h-4" />
                   Code Mermaid
                 </TabsTrigger>
               </TabsList>
 
               <TabsContent value="preview" className="mt-4">
-                <div className="border rounded-lg p-4 bg-white">
+                <div className="border rounded-lg p-4 bg-white shadow-sm">
                   {result.diagram ? (
                     <MermaidDiagram 
                       chart={result.diagram} 
