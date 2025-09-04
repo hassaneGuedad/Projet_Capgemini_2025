@@ -518,7 +518,8 @@ export default function Dashboard() {
       case STATUS.COMPLETED:
         return <CheckCircle2 className="h-4 w-4 text-green-500" />;
       default:
-        return <Clock className="h-4 w-4 text-gray-500" />;
+        // Si des fichiers existent, afficher l'icône de validation
+        return files.length > 0 ? <CheckCircle2 className="h-4 w-4 text-green-500" /> : <Clock className="h-4 w-4 text-gray-500" />;
     }
   };
 
@@ -529,7 +530,8 @@ export default function Dashboard() {
       case STATUS.COMPLETED:
         return 'Génération terminée';
       default:
-        return 'En attente';
+        // Si des fichiers existent, considérer le projet comme terminé
+        return files.length > 0 ? 'Terminé' : 'En attente';
     }
   };
 
@@ -540,7 +542,8 @@ export default function Dashboard() {
       case STATUS.COMPLETED:
         return 'bg-green-100 text-green-700 border-green-200';
       default:
-        return 'bg-gray-100 text-gray-700 border-gray-200';
+        // Si des fichiers existent, utiliser la couleur verte pour "Terminé"
+        return files.length > 0 ? 'bg-green-100 text-green-700 border-green-200' : 'bg-gray-100 text-gray-700 border-gray-200';
     }
   };
 
