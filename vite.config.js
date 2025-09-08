@@ -1,4 +1,5 @@
 import { defineConfig } from 'vite'
+import path from 'path'
 
 export default defineConfig({
   // Configuration du serveur dev et optimisation des dépendances
@@ -18,9 +19,17 @@ export default defineConfig({
     noExternal: ['nodemailer']  // Empêche nodemailer d'être externalisé en SSR (test, build)
   },
 
+  // Configuration des alias de chemins pour Vitest
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './')
+    }
+  },
+
   test: {
     globals: true,
-    environment: 'node',
+    environment: 'jsdom', // Changé de 'node' à 'jsdom' pour les tests React
+    setupFiles: ['./src/test/setup.tsx'], // Fichier de configuration des tests
     coverage: {
       reporter: ['text', 'lcov']
     }
