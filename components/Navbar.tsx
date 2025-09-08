@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -21,6 +22,7 @@ import { auth } from "@/lib/firebase-client";
 
 export const Navbar: React.FC = () => {
   const { user, isAuthenticated, login, logout, isLoading } = useAuth();
+  const router = useRouter();
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [loginForm, setLoginForm] = useState({ email: '', password: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -55,6 +57,11 @@ export const Navbar: React.FC = () => {
 
   const handleLogout = async () => {
     await logout();
+  };
+
+  const handleNavigation = (path: string) => {
+    router.push(path);
+    setMobileMenuOpen(false);
   };
 
   const handleGoogleSignIn = async () => {
@@ -164,36 +171,36 @@ export const Navbar: React.FC = () => {
 
           {/* Navigation Links (desktop) */}
           <div className="hidden md:flex items-center space-x-8">
-            <Link 
-              href="/" 
+            <button 
+              onClick={() => handleNavigation('/')}
               className="flex items-center space-x-2 text-gray-600 hover:text-blue-600 transition-colors duration-200"
             >
               <Home className="h-4 w-4" />
               <span>Accueil</span>
-            </Link>
+            </button>
             {isAuthenticated && (
-              <Link 
-                href="/dashboard" 
+              <button 
+                onClick={() => handleNavigation('/dashboard')}
                 className="flex items-center space-x-2 text-gray-600 hover:text-blue-600 transition-colors duration-200"
               >
                 <LayoutDashboard className="h-4 w-4" />
                 <span>Dashboard</span>
-              </Link>
+              </button>
             )}
-            <Link 
-              href="/guide" 
+            <button 
+              onClick={() => handleNavigation('/guide')}
               className="flex items-center space-x-2 text-gray-600 hover:text-blue-600 transition-colors duration-200"
             >
               <Code2 className="h-4 w-4" />
-              <span>Guide d’utilisation</span>
-            </Link>
-            <Link 
-              href="/contact" 
+              <span>Guide d'utilisation</span>
+            </button>
+            <button 
+              onClick={() => handleNavigation('/contact')}
               className="flex items-center space-x-2 text-gray-600 hover:text-blue-600 transition-colors duration-200"
             >
               <User className="h-4 w-4" />
               <span>Contact</span>
-            </Link>
+            </button>
           </div>
 
           {/* User Actions */}
@@ -315,40 +322,36 @@ export const Navbar: React.FC = () => {
         {mobileMenuOpen && (
           <div className="md:hidden bg-white border-b border-gray-200 w-full animate-fade-in-down">
             <div className="flex flex-col py-4 space-y-2">
-              <Link 
-                href="/" 
-                className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600"
-                onClick={() => setMobileMenuOpen(false)}
+              <button 
+                onClick={() => handleNavigation('/')}
+                className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 text-left w-full"
               >
                 <Home className="h-4 w-4" />
                 <span>Accueil</span>
-              </Link>
+              </button>
               {isAuthenticated && (
-                <Link 
-                  href="/dashboard" 
-                  className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600"
-                  onClick={() => setMobileMenuOpen(false)}
+                <button 
+                  onClick={() => handleNavigation('/dashboard')}
+                  className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 text-left w-full"
                 >
                   <LayoutDashboard className="h-4 w-4" />
                   <span>Dashboard</span>
-                </Link>
+                </button>
               )}
-              <Link 
-                href="/guide" 
-                className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600"
-                onClick={() => setMobileMenuOpen(false)}
+              <button 
+                onClick={() => handleNavigation('/guide')}
+                className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 text-left w-full"
               >
                 <Code2 className="h-4 w-4" />
-                <span>Guide d’utilisation</span>
-              </Link>
-              <Link 
-                href="/contact" 
-                className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600"
-                onClick={() => setMobileMenuOpen(false)}
+                <span>Guide d'utilisation</span>
+              </button>
+              <button 
+                onClick={() => handleNavigation('/contact')}
+                className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 text-left w-full"
               >
                 <User className="h-4 w-4" />
                 <span>Contact</span>
-              </Link>
+              </button>
             </div>
           </div>
         )}
