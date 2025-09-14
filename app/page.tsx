@@ -137,7 +137,7 @@ export default function Home() {
           </h1>
           
           <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            SmartProjectBuilder utilise des agents IA avancés pour comprendre vos besoins, 
+            CapWorkSpace utilise des agents IA avancés pour comprendre vos besoins, 
             planifier l'architecture et générer un code de qualité production. 
             Transformez vos idées en applications web complètes en quelques minutes.
           </p>
